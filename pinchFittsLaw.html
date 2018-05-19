@@ -1,4 +1,6 @@
-<html>
+<!doctype html>
+<!--[if IE 6]><html lang="en" class="no-js ie6"><![endif]-->
+<!--[if (gt IE 6)|!(IE)]><!--><html lang="en" class="no-js"><!--<![endif]-->
     <head>
         <title>Fitts' Law Tester</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scaleable=no">
@@ -8,6 +10,17 @@
         <script src="https://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         
         <style>
+		
+		#cursor {	   
+							height:1px;
+							border:1px solid red;
+							top:0px; 
+							position:relative;
+							z-index:100;
+							pointer-events:none;
+							display:block;
+							
+						}
             body {
                 font-family: Helvetica, sans-serif;
             }
@@ -122,7 +135,7 @@
         
     </head>
     <body>
-        
+        <hr id="cursor"/>
         <div id="start-overlay" class="centered">
             <h3>Welcome to the Fitts' Law Testing App</h3>
             <p> Your Name: <input id="name" type="text" value="test" onfocus="if(value==='test')value=''" onblur="if(value==='')value='test'"></p>
@@ -167,7 +180,7 @@
         
         
         
-        <div id="test-container" class="fullscreen">
+        <div id="test-container" class="fullscreen" >
             <div id="ribbon-1" class="ribbon" style="top:50px;"></div>
             <div id="ribbon-2" class="ribbon target" style="top:300px;"></div>
             <div id="trial-overlay">Practice</div>
@@ -177,7 +190,7 @@
             </div>
         </div>
         
-        
+		<script src="https://hammerjs.github.io/dist/hammer.js"></script>        
         
         
         <script type="text/javascript">
@@ -222,7 +235,35 @@
             var window_width;
             var scalefactor_x;
             var scalefactor_y;
-            
+//var for pinch
+			var myElement = document.getElementById('test-container');
+            var mc = new Hammer(myElement);
+			
+// 判断各种浏览器，找到正确的方法
+			// Find the right method, call on correct element
+			function launchIntoFullscreen() {
+				var elem = document.documentElement;//document.getElementById('test-container');
+
+				  if (elem.requestFullscreen) {
+						elem.requestFullscreen();
+					} else if (elem.webkitRequestFullscreen) {
+						elem.webkitRequestFullscreen();
+					} else if (elem.mozRequestFullScreen) {
+						elem.mozRequestFullScreen();
+					} else if (elem.msRequestFullscreen) {
+						elem.msRequestFullscreen();
+					}
+					
+					// window.screen.lockOrientationUniversal = screen.lockOrientation || screen.mozLockOrientation || screen.msLockOrientation;
+					// if (window.screen.lockOrientationUniversal("landscape-primary")) {
+					  // // orientation was locked
+					 
+					// } else {
+					  // // orientation lock failed
+					
+					// }	
+			}
+            var is_first = -1;            
             function submitSetup(event) {
                 event.stopPropagation();
                 if (!validateForm()) {
@@ -273,6 +314,7 @@
                 $("#start_button").unbind();
                 $("#start_button").prop("disabled",true);
                 $("#start_button").text("Starting...");
+				launchIntoFullscreen();
                 hideKeyboard();
                 setTimeout(function() {
                     $("#start-overlay").hide();
@@ -358,7 +400,7 @@
                 trials = shuffleArray(trials);
             
                 //Present a dummy trial to make sure people understand the interface and have good timing
-                height = 0.6; //trials[0]yheight;
+                height = 0.6; //trials[0].yheight;
                 mod_height = scalefactor_y * height;
                 amplitude = 1.75; //trials[0].amplitude;
                 mod_amplitude = scalefactor_y * amplitude;
@@ -374,11 +416,24 @@
                 
                 //Begin the presentTrial recursion
                 $("#test-container").show();
+				//fullscreen
+				
                 $("#test-container").unbind().bind('vmouseup',trialClick);
-                
-                cur_repetition = 15;
+                //for pinch
+				mc.get('pinch').set({ enable: true });
+                mc.on("pinch",pinchCursor);
+                mc.on("pinch", trialPinch);
+ 				//pinch开始及结束时显示或隐藏cursor
+		        mc.on("pinchstart",function(e){
+		            $('#cursor').css('top',e.center.y +'px');
+		            $('#cursor').css('display','block');
+		        });
+		        mc.on("pinchend",function(e){
+		            $('#cursor').css('display','none');
+		        });                  cur_repetition = 15;
                 cur_trial = dummy;
                 presentTrial(dummy);
+				
                 
             }
             
@@ -531,7 +586,47 @@
                 }
                 
             }
-            
+
+
+            function pinchCursor(e){
+                $('#cursor').css('top',e.center.y+'px');
+                return;
+            }
+
+            function trialPinch(e) {
+               // e.stopPropagation();
+               var cursorElem = $(document.elementFromPoint(e.center.x, e.center.y));
+                            
+                var x;
+                var y;
+
+                x = e.center.x;
+                y = e.center.y;
+                            
+                            // if(e.isFirst)
+                              //   firstscale = e.scale;
+
+                     //$('#cursor').css('top',y+'px');
+                
+                //split the screen down the middle and reject things on the wrong side
+                var tap_in_top_half = y < window_height/2;
+                
+                if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
+                    return;
+                }
+                else if (!first_ribbon_is_active && tap_in_top_half) {
+                    return;
+                }
+                
+                //find out where active bar is located
+                var minY = parseInt($(".target").css('top'));
+                var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
+                if(y >= minY && y <= maxY){
+                    trialHit();
+                       
+                }
+                else return;
+            }            
             function trialHit() {
                 if (typeof(cur_trial.name) == 'undefined' || cur_trial.name == null) {
                     //We've hit the dummy trial, so don't record results, but start the timer
