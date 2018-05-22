@@ -9,12 +9,12 @@
         <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="https://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="https://hammerjs.github.io/dist/hammer.js"></script> 
-	<script type="text/javascript" src="libs/FileSaver/FileSaver.min.js"></script>
-        <script type="text/javascript" src="tableExport.min.js"></script>
+	<script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
+        <script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
 	    
         <style>
 		
-		#cursor {	   
+		.cursor {	   
 							height:1px;
 							top:0px; 
 							position:relative;
@@ -131,7 +131,7 @@
                 text-align: right;
                 padding: 3px;
                 
-                display: none;
+                
                 
             }
             
@@ -153,7 +153,8 @@
         
     </head>
     <body >
-        <hr id="cursor"/>
+        <hr id="cursor" class="cursor"/>
+        
         <div id="start-overlay" class="centered">
             <h3>Welcome to the Fitts' Law Testing App</h3>
             <p> Your Name: <input id="name" type="text" value="test" onfocus="if(value==='test')value=''" onblur="if(value==='')value='test'"></p>
@@ -209,10 +210,13 @@
         
         
         <div id="test-container" class="fullscreen" >
+                <hr class="cursor" style="top:0px;"/>
+                <hr class="cursor" style="top:384px;"/>
+                <hr class="cursor" style="top:600px;"/>
             <div id="ribbon-1" class="ribbon" style="top:50px;"></div>
             <div id="ribbon-2" class="ribbon target" style="top:300px;"></div>
             <div id="trial-overlay">Practice</div>
-			<div id="debug-overlay">Practice</div>
+			<div id="debug-overlay"> debug</div>
             <div id="debug"><ol id="debugitems"><li>debug</li></ol></div>
             <div id="interstitial-overlay" class="fullscreen">
                 <div id="interstitial-box">Starting next test in a few seconds...</div>
@@ -235,8 +239,8 @@
       //      var heights = [0.25, 0.5, 1, 2];
       //      var amplitudes = [1, 2, 4, 8];
             var repetitions = 4;
-            var heights = [20, 40, 80,160,320];
-            var amplitudes = [400, 800, 1000];
+            var heights = [10, 20, 40,80,160];
+            var amplitudes = [40, 80, 160];
             // ***
             
             var flash_delay = 130; //msec
@@ -371,7 +375,7 @@
                 if (!validateForm()) {
                     return;
                 }
-                
+                launchIntoFullscreen();
                 //hack here to make sure physical, resolution, and window dimensions line up
                 updateScreenResolution();
                 
@@ -407,15 +411,15 @@
                              scalefactor_y = 1;//set to fix value
 							// scalefactor_x = resolution_width / physical_width;
                 
-                /*
+                
                 //add debug info
                 $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width))
                 $("#debug").append($("<li></li>").text("device_width_px: "+resolution_width))
                 $("#debug").append($("<li></li>").text("device_height_px: "+resolution_height))
                 $("#debug").append($("<li></li>").text("window_width_px: "+window_width))
                 $("#debug").append($("<li></li>").text("window_height_px: "+window_height))
-                $("#debug").append($("<li></li>").text("window_width_cm: "+window_width / scalefactor_x))
-                */
+               
+             
                 
                 $("#start_button").unbind();
                 $("#start_button").prop("disabled",true);
@@ -428,7 +432,7 @@
                     // $("#start-overlay").hide();
                     // populateTrials();
                 // }, 1000)
-				launchIntoFullscreen();
+				
                 
             }
             
@@ -649,7 +653,8 @@
                 $("#ribbon-2").css("height",trial.ribbon_height);
                 $("#ribbon-2").removeClass("target");
                 $("#ribbon-2").removeClass("inactive");
-                
+
+                $("#debug-overlay").text("ribbon_1_pos="+trial.ribbon_1_pos+";ribbon_2_pos="+trial.ribbon_2_pos);   
                 //alternate active ribbons
                 if (total_repetitions % 2 == 0) {
                     first_ribbon_is_active = true;
@@ -753,7 +758,7 @@
 					countDownStart = false;
 					if(countDownStart)clearTimeout(countDownTimer);
 				}
-				 $("#debug-overlay").text(";overlapCursorJudge:x"+countDownStart); 
+				 //$("#debug-overlay").text("countDownStart"+countDownStart); 
 			}
             function trialHit() {
                 if (typeof(cur_trial.name) == 'undefined' || cur_trial.name == null) {
@@ -825,21 +830,21 @@
                 
                 //record end time and compute duration
                 var name = $("#name").val();
-                var participant = $("#type").val();
+                var inputType = $("#type").val();
                 var device = $("#device").val();
                 var end_time = $.now();
                 var total_time_spent = end_time - total_start_time;
                 var total_error_rate = (parseFloat(total_error_count) / total_repetitions) * 100.0;
                 
                 //build results table
-                var headers = ["Name","Participant","Device","Width","Height","Total_Time(ms)","Total_Error(%)"];
+                var headers = ["Name","InputType","Width","Height","Total_Time(ms)","Total_Error(%)"];
                 for (var i=0; i<sorted_trial_names.length; i++) {
                     trial = sorted_trial_names[i];
                     headers.push(trial+"_Avg_Time(ms)");
                     headers.push(trial+"_Errors(%)");
                 }
                 
-                var data = [name, participant, device, physical_width, physical_height, total_time_spent, total_error_rate];
+                var data = [name, inputType, physical_width, physical_height, total_time_spent, total_error_rate];
                 for (var i=0; i<sorted_trial_names.length; i++) {
                     result_rows = results[sorted_trial_names[i]];
                     duration = 0.0;
