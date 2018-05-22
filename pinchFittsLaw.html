@@ -130,7 +130,7 @@
                 font-size: x-small;
                 text-align: right;
                 padding: 3px;
-                
+                display:none;
                 
                 
             }
@@ -375,7 +375,7 @@
                 if (!validateForm()) {
                     return;
                 }
-                launchIntoFullscreen();
+                
                 //hack here to make sure physical, resolution, and window dimensions line up
                 updateScreenResolution();
                 
@@ -413,12 +413,12 @@
                 
                 
                 //add debug info
-                $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width))
+               /* $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width))
                 $("#debug").append($("<li></li>").text("device_width_px: "+resolution_width))
                 $("#debug").append($("<li></li>").text("device_height_px: "+resolution_height))
                 $("#debug").append($("<li></li>").text("window_width_px: "+window_width))
                 $("#debug").append($("<li></li>").text("window_height_px: "+window_height))
-               
+               */
              
                 
                 $("#start_button").unbind();
@@ -433,7 +433,7 @@
                     // populateTrials();
                 // }, 1000)
 				
-                
+                launchIntoFullscreen();
             }
             
             function validateForm() {
