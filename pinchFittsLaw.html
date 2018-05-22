@@ -130,7 +130,8 @@
                 font-size: x-small;
                 text-align: right;
                 padding: 3px;
-                display:none;
+                display:block;
+
                 
                 
             }
@@ -210,9 +211,6 @@
         
         
         <div id="test-container" class="fullscreen" >
-                <hr class="cursor" style="top:0px;"/>
-                <hr class="cursor" style="top:384px;"/>
-                <hr class="cursor" style="top:600px;"/>
             <div id="ribbon-1" class="ribbon" style="top:50px;"></div>
             <div id="ribbon-2" class="ribbon target" style="top:300px;"></div>
             <div id="trial-overlay">Practice</div>
@@ -408,17 +406,18 @@
                 }
                 
 							 //scalefactor_y = resolution_height / physical_height;
-                             scalefactor_y = 1;//set to fix value
+                             scalefactor_y = window.devicePixelRatio;//set to fix value
 							// scalefactor_x = resolution_width / physical_width;
                 
                 
                 //add debug info
-               /* $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width))
-                $("#debug").append($("<li></li>").text("device_width_px: "+resolution_width))
-                $("#debug").append($("<li></li>").text("device_height_px: "+resolution_height))
-                $("#debug").append($("<li></li>").text("window_width_px: "+window_width))
-                $("#debug").append($("<li></li>").text("window_height_px: "+window_height))
-               */
+                $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width));
+                $("#debug").append($("<li></li>").text("device_width_px: "+resolution_width));
+                $("#debug").append($("<li></li>").text("device_height_px: "+resolution_height));
+                $("#debug").append($("<li></li>").text("window_width_px: "+window_width));
+                $("#debug").append($("<li></li>").text("window_height_px: "+window_height));
+                $("#debug").append($("<li id='bar1'></li>").text("ribbon1_pos: "));
+                $("#debug").append($("<li id='bar2'></li>").text("ribbon2_pos: "));
              
                 
                 $("#start_button").unbind();
@@ -654,7 +653,9 @@
                 $("#ribbon-2").removeClass("target");
                 $("#ribbon-2").removeClass("inactive");
 
-                $("#debug-overlay").text("ribbon_1_pos="+trial.ribbon_1_pos+";ribbon_2_pos="+trial.ribbon_2_pos);   
+               // $("#debug-overlay").text("r1="+trial.ribbon_1_pos+";r2="+trial.ribbon_2_pos); 
+               $("#bar1").text("ribbon1_pos:"+trial.ribbon_1_pos);
+               $("#bar2").text("ribbon2_pos:"+trial.ribbon_2_pos);
                 //alternate active ribbons
                 if (total_repetitions % 2 == 0) {
                     first_ribbon_is_active = true;
@@ -722,15 +723,15 @@
                 y = ev.center.y;
 				
                 $('#cursor').css('top',ev.center.y+'px');            
-                //$("#debug-overlay").text(ev.type+";Practice:x="+ev.center.x+";y="+ev.center.y);                       
+                $("#debug-overlay").text("x="+ev.center.x+";y="+ev.center.y);                       
                 //split the screen down the middle and reject things on the wrong side
                 var tap_in_top_half = y < window_height/2;
                 
                 if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
-                  //  return;
+                    return;
                 }
                 else if (!first_ribbon_is_active && tap_in_top_half) {
-                   //return;
+                   return;
                 }
                 
                overlapCursorJudge();
@@ -927,11 +928,11 @@
                 //Fix if we're on a mobile device (hopefully)
                 if( $.browser.mobile ) {
                     //using physical resolution
-                    width = window.screen.width*window.devicePixelRatio;
-                    height = window.screen.height*window.devicePixelRatio;
+                    //width = window.screen.width*window.devicePixelRatio;
+                    //height = window.screen.height*window.devicePixelRatio;
                     //using logical resolution
-                   // width = window.screen.width;
-                   // height = window.screen.height;
+                    width = window.screen.width;
+                    height = window.screen.height;
                     window_width = width;
                     window_height = height;
                     resolution_width = width;
