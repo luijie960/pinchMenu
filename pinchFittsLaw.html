@@ -145,11 +145,16 @@
             }
             .ribbon.target {
                 background-color: #3399ff;
+                opacity:0.5
             }
-            
+            .ribbon.target.hover {
+                color: #FFF;
+                opacity:1
+            }
             .smaller {
                 font-size: smaller;
             }
+            
         </style>
         
     </head>
@@ -550,6 +555,24 @@
 					//move cursor
 					 mc.on("pinch",function(ev){
 					 	$('#cursor').css('top',ev.center.y +'px');
+                         var y = ev.center.y;
+                        //find out where active bar is located
+                        var minY1 = parseInt($("#ribbon-1").css('top'));
+                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($(".target").css('height'));
+                        var minY2 = parseInt($("#ribbon-2").css('top'));
+                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($(".target").css('height'));
+                        if(y >= minY1 && y <= maxY1)
+                             $("#ribbon-1").addClass('hover');
+                       
+                        else 
+                            if($("#ribbon-1").hasClass('hover')) $("#ribbon-1").removeClass('hover');
+                        if(y >= minY2 && y <= maxY2)
+                             $("#ribbon-2").addClass('hover');
+                       
+                        else 
+                            if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
+                                      
+                                 
 						 });
 					//hide cursor
 					// mc.on("pinchend",function(ev){
@@ -774,6 +797,7 @@
                 }
                 else 
 				{
+                   
 					countDownStartAndOverlay = false;
 					if(countDownStartAndOverlay)clearTimeout(countDownTimer);
 				}
