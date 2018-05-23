@@ -130,7 +130,7 @@
                 font-size: x-small;
                 text-align: right;
                 padding: 3px;
-                display:block;
+                display:none;
 
                 
                 
@@ -251,7 +251,7 @@
             var cur_repetition = 0;
             var cur_start_time;
             var trial_flash_queued = false;
-            var total_repetitions = -6;
+            var total_repetitions = -5;
             var total_error_count = 0;
             var total_start_time;
             var first_ribbon_is_active = false;
@@ -273,16 +273,16 @@
 			// create a pinch and rotate recognizer
 			// these require 2 pointers
 			
-			//mc.get('pinch').set({ enable: true });
-			mc.add(new Hammer.Pinch());
+			
+			//mc.add(new Hammer.Pinch());
 			// mc.on("pinch pinchin pinchout pinchcancel",function (ev){
 				
 				// $("#debug-overlay").text(ev.type+";Practice:x="+ev.center.x+";y="+ev.center.y);
 				// $('#cursor').css('top',ev.center.y+'px');
 			// });//move cursor
 			
-			var countDownTime = 1000;//ms
-			var countDownStart = false; 
+			var pinchWaitTime = 500;//ms
+			var countDownStartAndOverlay = false; 
 			var countDownTimer;
 
             //click function for result-overlay
@@ -297,10 +297,11 @@
                 
                 cur_repetition = 0;
                 trial_flash_queued = false;
-                total_repetitions = -6;
+                total_repetitions = -5;
                 total_error_count = 0;
                 first_ribbon_is_active = false;
                 isFirstTest = false;
+                $("#cursor").css("display","none");
                 $("#start_button").click(submitSetup);
                 $("#start_button").prop("disabled",false);
                 $("#start_button").text("start");
@@ -370,13 +371,13 @@
                
             function submitSetup(event) {
                 event.stopPropagation();
-                if (!validateForm()) {
-                    return;
-                }
+                
                 
                 //hack here to make sure physical, resolution, and window dimensions line up
                 updateScreenResolution();
-                
+                if (!validateForm()) {
+                    return;
+                }
                 //physical_width = parseFloat( $("#width").val() );
                 //physical_height = parseFloat( $("#height").val() );
                 //using physical resolution
@@ -411,14 +412,19 @@
                 
                 
                 //add debug info
-                $("#debug").append($("<li></li>").text("recorded_width_cm: "+physical_width));
-                $("#debug").append($("<li></li>").text("device_width_px: "+resolution_width));
-                $("#debug").append($("<li></li>").text("device_height_px: "+resolution_height));
+                $("#debug").append($("<li></li>").text("devicePixelRatio: "+scalefactor_y));
+                $("#debug").append($("<li></li>").text("screen_width_px: "+window.screen.width));
+                $("#debug").append($("<li></li>").text("screen_height_px: "+window.screen.height));
+                $("#debug").append($("<li></li>").text("$(window).width: "+$(window).width()));
+                $("#debug").append($("<li></li>").text("$(window).height: "+$(window).height()));
                 $("#debug").append($("<li></li>").text("window_width_px: "+window_width));
                 $("#debug").append($("<li></li>").text("window_height_px: "+window_height));
-                $("#debug").append($("<li id='bar1'></li>").text("ribbon1_pos: "));
-                $("#debug").append($("<li id='bar2'></li>").text("ribbon2_pos: "));
-             
+               
+                $("#debug").append($("<li id='bar-name'></li>").text("ribbon_name: "));
+                $("#debug").append($("<li id='bar-height'></li>").text("ribbon_pos: "));
+                $("#debug").append($("<li id='bar-amplitude'></li>").text("ribbon_amplitude: "));
+                $("#debug").append($("<li id='bar1-pos'></li>").text("ribbon1_pos: "));
+                $("#debug").append($("<li id='bar2-pos'></li>").text("ribbon2_pos: "));
                 
                 $("#start_button").unbind();
                 $("#start_button").prop("disabled",true);
@@ -436,8 +442,10 @@
             }
             
             function validateForm() {
-                w = parseFloat( $("#width").val() );
-                h = parseFloat( $("#height").val() );
+                //w = parseFloat( $("#width").val() );
+                //h = parseFloat( $("#height").val() );
+                w = resolution_width;
+                h = resolution_height;
                 n = $("#name").val();
                 d = $("#device").val();
                 
@@ -467,8 +475,8 @@
                     }
                 }
                 if (smallest_trial >= h) {
-                    //alert("The screen must be at least "+smallest_trial+"cm hight for the test. \nTry reloading the page in landscape mode.");
-                    //return false;
+                    alert("The screen must be at least "+smallest_trial+"cm hight for the test. \nTry reloading the page in landscape mode.");
+                    return false;
                 }
                 
                 return true;
@@ -531,22 +539,24 @@
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
 					$("#test-container").unbind().bind('vmouseup',trialClick);
-					 //alert("tap gesture type!");
+                    mc.get('pinch').set({ enable:false});
+                    
                      }
 				else{
                 //for pinch
-					
-					
-					//show cursor
-					mc.on("pinchstart",function(ev){
-						$('#cursor').css('top',ev.center.y +'px');
-						$('#cursor').css('display','block');
-					});
+                     $('#cursor').css('display','block');//show cursor
+
+                     mc.get('pinch').set({ enable: true });
+					//move cursor
+					 mc.on("pinch",function(ev){
+					 	$('#cursor').css('top',ev.center.y +'px');
+						 });
 					//hide cursor
-					mc.on("pinchend",function(ev){
-						$('#cursor').css('display','none');
-					});
-					mc.on("pinch pinchin pinchout pinchcancel",trialPinch);//move cursor
+					// mc.on("pinchend",function(ev){
+					// 	$('#cursor').css('display','none');
+					// });
+
+					mc.on("pinch",trialPinch);
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
 					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
 					// else alert("Wrong gesture type!");
@@ -582,6 +592,7 @@
                     return;
                 }
                 else {
+                    
                     //We have to queue a new trial to run
                     cur_trial = trials.shift();
                     cur_repetition = 0;
@@ -614,9 +625,10 @@
                     $(".ribbon").css("backgroundColor","");
                     trial_flash_queued = false;
                     
-                   if($('#type option:selected').val()==='tap') $("#test-container").unbind();
-                   $("#interstitial-overlay").show();   
-                   setInterval(clearInterstitialOverlay, 3000);
+                   //if($('#type option:selected').val()==='tap') $("#test-container").unbind();
+                   //$("#interstitial-overlay").show();   
+                   //setInterval(clearInterstitialOverlay, 3000);
+                   clearInterstitialOverlay();
                     
                 }
                 
@@ -653,9 +665,14 @@
                 $("#ribbon-2").removeClass("target");
                 $("#ribbon-2").removeClass("inactive");
 
+                //for debug
                // $("#debug-overlay").text("r1="+trial.ribbon_1_pos+";r2="+trial.ribbon_2_pos); 
-               $("#bar1").text("ribbon1_pos:"+trial.ribbon_1_pos);
-               $("#bar2").text("ribbon2_pos:"+trial.ribbon_2_pos);
+               $("#bar1-pos").text("ribbon1_pos:"+trial.ribbon_1_pos);
+               $("#bar2-pos").text("ribbon2_pos:"+trial.ribbon_2_pos);
+               $("#bar-height").text("ribbon_height:"+trial.ribbon_height);
+               $("#bar-amplitude").text("ribbon_amplitude s:"+trial.amplitude);
+               $("#bar-name").text("ribbon_name:"+trial.name);
+
                 //alternate active ribbons
                 if (total_repetitions % 2 == 0) {
                     first_ribbon_is_active = true;
@@ -676,10 +693,11 @@
             }
             
             function trialClick(e) {
-                e.stopPropagation();
+               // e.stopPropagation();
                 
                 var x;
                 var y;
+                $("#debug-overlay").text("event:"+e.type); 
                 if (e.pageX != undefined && e.pageY != undefined) {
                     x = e.pageX;
                     y = e.pageY;
@@ -709,7 +727,7 @@
                     trialHit();
                 }
                 else {
-                    trialMiss();
+                  //  trialMiss();//must hit target
                 }
                 
             }
@@ -722,8 +740,8 @@
                 var y;
                 y = ev.center.y;
 				
-                $('#cursor').css('top',ev.center.y+'px');            
-                $("#debug-overlay").text("x="+ev.center.x+";y="+ev.center.y);                       
+               // $('#cursor').css('top',ev.center.y+'px');        //move cursor    
+                $("#debug-overlay").text(ev.type+":x="+ev.center.x+";y="+ev.center.y);                       
                 //split the screen down the middle and reject things on the wrong side
                 var tap_in_top_half = y < window_height/2;
                 
@@ -744,22 +762,22 @@
 				var minY = parseInt($(".target").css('top'));
                 var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                 if(y >= minY && y <= maxY){
-                    if(countDownStart){//do nothing wait for time out
-					
-					}
-					else//strart timer
-					{countDownStart = true;
-					 countDownTimer = setTimeout(trialHit, countDownTime);
+                    if(!countDownStartAndOverlay)//strart timer
+					{countDownStartAndOverlay = true;
+					 countDownTimer = setTimeout(function(){
+                         if(countDownStartAndOverlay)trialHit();
+
+                     }, pinchWaitTime);
 					 
 					}						
 					                       
                 }
                 else 
 				{
-					countDownStart = false;
-					if(countDownStart)clearTimeout(countDownTimer);
+					countDownStartAndOverlay = false;
+					if(countDownStartAndOverlay)clearTimeout(countDownTimer);
 				}
-				 //$("#debug-overlay").text("countDownStart"+countDownStart); 
+				 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
 			}
             function trialHit() {
                 if (typeof(cur_trial.name) == 'undefined' || cur_trial.name == null) {
@@ -825,8 +843,11 @@
             
             
             function presentResults() {
+                if( $("#results-overlay").is(':visible'))return;
                 $("#results-overlay").hide();
                 $("#test-container").hide();
+                $('#cursor').css('display','none');
+
                 if($('#type option:selected').val()==='tap')$("#test-container").unbind();
                 
                 //record end time and compute duration
