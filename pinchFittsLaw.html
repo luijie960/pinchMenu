@@ -11,7 +11,7 @@
         <script src="https://hammerjs.github.io/dist/hammer.js"></script> 
 	<script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
         <script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
-	    
+	    <script src="http://inorganik.github.io/debugout.js/debugout.js"></script>
         <style>
 		
 		.cursor {	   
@@ -170,9 +170,14 @@
                     <option value="pinchIn">pinchIn</option>
                     <option value="pinchOut">pinchOut</option>
                     <option value="tap">tap</option>
-                    
                 </select>
-             <div style="display:none">  
+                <br/>
+                
+                <input id="physicalSizeN" type="radio" name="physicalSize" value="no" onclick='$("#physicalSizeInput").hide();'  checked> 
+                <input id="physicalSizeY" type="radio" name="physicalSize" value="yes" onclick='$("#physicalSizeInput").show();' > 
+                <label for="physicalSizeN" >without physical size</label> 
+                <label for="physicalSizeY" >with physical size</label>
+                <div id="physicalSizeInput" style="display:none">  
                 <br/>
                 Device (i.e. touchpad, mouse...): <input id="device" type="text" value="phone" onfocus="if(value==='phone')value=''" onblur="if(value==='')value='phone'">
                 </p>
@@ -198,14 +203,18 @@
         
         <div id="results-overlay">
             <h3>Here are the results of your Fitts' law tests.</h3>
-            <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10_X_20 would mean that the ribbons were 10 pt(logic point) wide, and 20pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
+            <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10_X_20 would mean that the ribbons were 10cm*scaleFactor pt(logic point) wide, and 20cm*scalefactor pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
+            <p id="" value='scaleFactor'></p>
             <div id="results-table">
                  <table id="table-elem">
-                 </table>>
+                 </table>
             </div>
             <br/>
             <br/>
             <button id="save-file" style ="width:200px">saveToFile</button>
+            <br/>
+            <br>
+            <button id="download-log" style ="width:200px">downloadLog</button>
             <br/>
             <button id="restart" style ="width:200px">Back</button>
             <br/>
@@ -239,16 +248,16 @@
             
             // *** Change these conditions to run different tests
       //      var repetitions = 20;
-      //      var heights = [0.25, 0.5, 1, 2];
-      //      var amplitudes = [1, 2, 4, 8];
-            var repetitions = 4;
-            var heights = [10, 20, 40,80,160];
-            var amplitudes = [40, 80, 160];
+            var heights = [0.2, 0.4, 0.6, 0.8,1];//cm
+            var amplitudes = [3, 6, 9];//cm
+            var repetitions = 2;
+           // var heights = [10, 20, 40,80,160];//px
+           // var amplitudes = [40, 80, 160];//px
             // ***
             
             var flash_delay = 130; //msec
             
-            
+           
             //Ongoing tests
             var trials;
             var sorted_trial_names;
@@ -256,7 +265,7 @@
             var cur_repetition = 0;
             var cur_start_time;
             var trial_flash_queued = false;
-            var total_repetitions = -5;
+            var total_repetitions = -1;//practice one times
             var total_error_count = 0;
             var total_start_time;
             var first_ribbon_is_active = false;
@@ -277,8 +286,7 @@
 			var mc = new Hammer(myElement);
 			// create a pinch and rotate recognizer
 			// these require 2 pointers
-			
-			
+		    
 			//mc.add(new Hammer.Pinch());
 			// mc.on("pinch pinchin pinchout pinchcancel",function (ev){
 				
@@ -289,23 +297,50 @@
 			var pinchWaitTime = 500;//ms
 			var countDownStartAndOverlay = false; 
 			var countDownTimer;
+            //debug log    	
+            var bugout = new debugout();
+            var exp_num = 0;
+            //var exp_distance = 0;
+            //var exp_first_time = $.now();
+            //var exp_time;
+            var cursorOnTarget = 0;
+            var isHit = 0;
+            //touch point location
+            var p1x = 0;
+            var p1y = 0;
+            var p2x = 0;
+            var p2y = 0;
 
             //click function for result-overlay
             $('#save-file').click(function(){
                     $('#results-table').tableExport({fileName:$("#name").val()+'-'+$.now(),type:'csv'});
                    alert('saving!');                
                     }) ;
-                    
+            //click function for log-download 
+            $('#download-log').click(function(){bugout.downloadLog();
+                exitFullscreen();
+                });
             //do test again
             $('#restart').click(function(){
                 
                 
                 cur_repetition = 0;
                 trial_flash_queued = false;
-                total_repetitions = -5;
+                total_repetitions = -1;
                 total_error_count = 0;
                 first_ribbon_is_active = false;
                 isFirstTest = false;
+
+                //for log
+                exp_num = 0;
+                cursorOnTarget = 0;
+                isHit = 0;
+                //touch point location
+                p1x = 0;
+                p1y = 0;
+                p2x = 0;
+                p2y = 0;
+                
                 $("#cursor").css("display","none");
                 $("#start_button").click(submitSetup);
                 $("#start_button").prop("disabled",false);
@@ -318,7 +353,7 @@
                 exitFullscreen();
             });
 			
-// 判断各种浏览器，找到正确的方法
+
 			// Find the right method, call on correct element
 			function launchIntoFullscreen() {
 				//var elem = document.getElementById('test-container');
@@ -356,7 +391,7 @@
                     }
                     }
 
-            //判断是否全屏
+          
             function isFull() {
                 var fullscreenElement =
                     document.fullscreenEnabled
@@ -383,11 +418,16 @@
                 if (!validateForm()) {
                     return;
                 }
-                //physical_width = parseFloat( $("#width").val() );
-                //physical_height = parseFloat( $("#height").val() );
-                //using physical resolution
-                physical_width = resolution_width;
-                physical_height = resolution_height;
+                if($('input:radio[name="physicalSize"]:checked').val()==='yes')
+                {
+                    physical_width = parseFloat( $("#width").val() );
+                    physical_height = parseFloat( $("#height").val() );
+                }
+                else
+                {//if physical_width or physical_height is empty, using physical resolution
+                    physical_width = resolution_width;
+                    physical_height = resolution_height;
+                }
                 var width_is_larger_than_height = physical_width > physical_height;
                 
                 if (width_is_larger_than_height && resolution_width < resolution_height) {
@@ -411,8 +451,11 @@
                     window_height = temp;
                 }
                 
-							 //scalefactor_y = resolution_height / physical_height;
-                             scalefactor_y = window.devicePixelRatio;//set to fix value
+                if($('input:radio[name="physicalSize"]:checked').val()==='yes')
+							 scalefactor_y = resolution_height / physical_height;
+                else
+                            scalefactor_y = 50;//set to fix value
+                            // scalefactor_y = window.devicePixelRatio;//set to fix value
 							// scalefactor_x = resolution_width / physical_width;
                 
                 
@@ -447,10 +490,16 @@
             }
             
             function validateForm() {
-                //w = parseFloat( $("#width").val() );
-                //h = parseFloat( $("#height").val() );
-                w = resolution_width;
-                h = resolution_height;
+                if($('input:radio[name="physicalSize"]:checked').val()==='yes')
+                {
+                    w = parseFloat( $("#width").val() );
+                    h = parseFloat( $("#height").val() );
+                }
+                else
+                {// using resolution width and height 
+                    w = resolution_width;
+                    h = resolution_height;
+                }
                 n = $("#name").val();
                 d = $("#device").val();
                 
@@ -541,29 +590,37 @@
                 
                 //Begin the presentTrial recursion
                 $("#test-container").show();
+                bugout.log("inputNum testNo trialName cur_repetition onTarget hit name type x1 y1 x2 y2 time cur_start_time");
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
-					$("#test-container").unbind().bind('vmouseup',trialClick);
+                    $("#test-container").unbind().bind('vmouseup',trialClick);
                     mc.get('pinch').set({ enable:false});
                     
                      }
 				else{
                 //for pinch
+                    
                      $('#cursor').css('display','block');//show cursor
 
                      mc.get('pinch').set({ enable: true });
 					//move cursor
 					 mc.on("pinch",function(ev){
 					 	$('#cursor').css('top',ev.center.y +'px');
+                         //for log, record location for touch point
+                        p1x = ev.pointers[0].x;
+                        p1y = ev.pointers[0].y;
+                        p2x = ev.pointers[1].x;
+                        p2y = ev.pointers[1].y;
+
                          var y = ev.center.y;
                         //find out where active bar is located
                         var minY1 = parseInt($("#ribbon-1").css('top'));
-                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($(".target").css('height'));
+                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($("#ribbon-1").css('height'));
                         var minY2 = parseInt($("#ribbon-2").css('top'));
-                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($(".target").css('height'));
+                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($("#ribbon-2").css('height'));
+                        
                         if(y >= minY1 && y <= maxY1)
                              $("#ribbon-1").addClass('hover');
-                       
                         else 
                             if($("#ribbon-1").hasClass('hover')) $("#ribbon-1").removeClass('hover');
                         if(y >= minY2 && y <= maxY2)
@@ -571,6 +628,7 @@
                        
                         else 
                             if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
+                        
                                       
                                  
 						 });
@@ -583,6 +641,7 @@
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
 					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
 					// else alert("Wrong gesture type!");
+                    setInterval(writeLog, 100)//
 					
 				}                  
 				cur_repetition = 15;
@@ -711,12 +770,17 @@
                 //record start time
                 cur_start_time = $.now();
                 cur_error_count = 0;
-				overlapCursorJudge();
+
+                //for log
+                isHit = 0;
+				
                 
             }
             
             function trialClick(e) {
                // e.stopPropagation();
+
+                
                 
                 var x;
                 var y;
@@ -731,28 +795,63 @@
                     y = e.clientY + document.body.scrollTop +
                         document.documentElement.scrollTop;
                 }
+
+                
                 
                 //split the screen down the middle and reject things on the wrong side
                 var tap_in_top_half = y < window_height/2;
-                
+                var correctScreenRegion = 1;
                 if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
-                    return;
+                    //return;
+                    correctScreenRegion = 0;
                 }
                 else if (!first_ribbon_is_active && tap_in_top_half) {
-                    return;
+                    //return;
+                    correctScreenRegion = 0;
                 }
                 
                 //find out where active bar is located
                 var minY = parseInt($(".target").css('top'));
                 var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
+
+                //for log
+                p1x = x;
+                p1y = y;
+                p2x = -1;
+                p2y = -1;
                 
-                if (y >= minY && y <= maxY) {
-                    trialHit();
+               
+                if(correctScreenRegion)
+                {
+                    if (y >= minY && y <= maxY) {
+                       
+                        //for log
+                        
+                        isHit = 1;
+                       
+                        writeLog();
+
+                        trialHit();
+                    }
+                    else {
+                        //for log
+                    
+                        isHit = 0;
+                        
+                        writeLog();
+                    //  trialMiss();//must hit target
+                    
+                    }
                 }
-                else {
-                  //  trialMiss();//must hit target
+                else
+                {       isHit = 0;
+                        writeLog();
+
+
                 }
-                
+
+             
+               
             }
 
         
@@ -762,47 +861,85 @@
                             
                 var y;
                 y = ev.center.y;
-				
+                
+                               		
                // $('#cursor').css('top',ev.center.y+'px');        //move cursor    
                 $("#debug-overlay").text(ev.type+":x="+ev.center.x+";y="+ev.center.y);                       
                 //split the screen down the middle and reject things on the wrong side
-                var tap_in_top_half = y < window_height/2;
+                //var tap_in_top_half = y < window_height/2;
                 
-                if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
-                    return;
-                }
-                else if (!first_ribbon_is_active && tap_in_top_half) {
-                   return;
-                }
+                // if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
+                //    // return;
+                // }
+                // else if (!first_ribbon_is_active && tap_in_top_half) {
+                //   // return;
+                // }
                 
-               overlapCursorJudge();
-            } 
-			function overlapCursorJudge(){
-				var y = parseInt($('#cursor').css('top'));
-                                     
-				
-				//find out where active bar is located
-				var minY = parseInt($(".target").css('top'));
+                var y = parseInt($('#cursor').css('top'));
+                //find out where active bar is located
+                var minY = parseInt($(".target").css('top'));
                 var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                 if(y >= minY && y <= maxY){
                     if(!countDownStartAndOverlay)//strart timer
-					{countDownStartAndOverlay = true;
-					 countDownTimer = setTimeout(function(){
-                         if(countDownStartAndOverlay)trialHit();
+                    {countDownStartAndOverlay = true;
+                        //clearTimeout(countDownTimer);
+                        countDownTimer = setTimeout(function(){
+                        if(countDownStartAndOverlay)
+                        {  
+                        
+                            //fo log
+                            isHit = 1;
+                            writeLog(); //writlog must before trialHit
+                            isHit = 0;
+                            trialHit();
+                            
+                        }
+                        
 
-                     }, pinchWaitTime);
-					 
-					}						
-					                       
+                    }, pinchWaitTime);
+                    
+                    }						
+                                        
                 }
                 else 
-				{
-                   
-					countDownStartAndOverlay = false;
-					if(countDownStartAndOverlay)clearTimeout(countDownTimer);
-				}
-				 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
+                {
+                
+                    
+                   // if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
+                    countDownStartAndOverlay = false;
+                }
+                //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
+            } 
+
+			function overlapCursorJudge(){
+				
 			}
+
+            function writeLog()
+            {
+
+               var minY = parseInt($(".target").css('top'));
+               var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
+               var y;
+               if($('#type option:selected').val()==='tap')
+               {//for tap
+                    y = p1y;
+               }
+               else
+               {                
+                    y = parseInt($('#cursor').css('top'));
+                }
+                    if(y>=minY&&y<=maxY)
+                        cursorOnTarget = 1;
+                    else
+                        cursorOnTarget = 0;
+                    //exp_distance = Math.sqrt(Math.pow((ev.pointers[0].clientX - ev.pointers[1].clientX),2)+Math.pow((ev.pointers[0].clientY - ev.pointers[1].clientY),2));
+                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+String($.now())+" "+cur_start_time;
+                    //export finger location message
+                    //bugout.log("number x1 y1 x2 y2 time distance");
+                    bugout.log(line);
+               	
+            }
             function trialHit() {
                 if (typeof(cur_trial.name) == 'undefined' || cur_trial.name == null) {
                     //We've hit the dummy trial, so don't record results, but start the timer
@@ -811,7 +948,8 @@
                 else {
                     recordResults(true);
                 }
-                
+               
+
                 //flash to show hit and queue the next one
                 $(".target").css("backgroundColor","#33cc33");
                 trial_flash_queued = true;
@@ -867,12 +1005,17 @@
             
             
             function presentResults() {
+
+                if($('#type option:selected').val()==='tap')$("#test-container").unbind();
+                clearInterval(writeLog);
+
                 if( $("#results-overlay").is(':visible'))return;
                 $("#results-overlay").hide();
                 $("#test-container").hide();
                 $('#cursor').css('display','none');
 
-                if($('#type option:selected').val()==='tap')$("#test-container").unbind();
+                
+                
                 
                 //record end time and compute duration
                 var name = $("#name").val();
@@ -887,7 +1030,7 @@
                 for (var i=0; i<sorted_trial_names.length; i++) {
                     trial = sorted_trial_names[i];
                     headers.push(trial+"_Avg_Time(ms)");
-                    headers.push(trial+"_Errors(%)");
+                   // headers.push(trial+"_Errors(%)");//do not show error rate
                 }
                 
                 var data = [name, inputType, physical_width, physical_height, total_time_spent, total_error_rate];
@@ -897,7 +1040,7 @@
                     num_error = 0.0;
                     if (result_rows == undefined || result_rows.length == 0) {
                         data.push("too big");
-                        data.push("too big");
+                      //  data.push("too big");//do not show error rate
                     }
                     else {
                         for (var j=0; j<result_rows.length; j++) {
@@ -908,7 +1051,7 @@
                             }
                         }
                         data.push(duration / result_rows.length);
-                        data.push((num_error / result_rows.length) * 100.0);
+                      //  data.push((num_error / result_rows.length) * 100.0);//do not show error rate
                     }
                 }
                 
@@ -922,7 +1065,7 @@
                 //$("#results-file-container").append(makeCSV(headers,data));
 
             
-                
+                $("#scaleFactor").text("scaleFactor:"+scalefactor_y);//show scalefactor_y
                 $("#results-overlay").show();
                 
                 
