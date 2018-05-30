@@ -186,10 +186,10 @@
                 <p >Please measure the width and height of your screen using a ruler so we can accurately scale the test.</p>
                  <p>
                 Width (centimeters):
-                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.8" onfocus="if(value==='6.8')value=''" onblur="if(value==='')value='6.8'">
+                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.15')value=''" onblur="if(value==='')value='6.15'">
                     <br/>
                 Height (centimeters):
-                <input id="height" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="12.1" onfocus="if(value==='12.1')value=''" onblur="if(value==='')value='12.1'">
+                <input id="height" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="11" onfocus="if(value==='11')value=''" onblur="if(value==='')value='11'">
                 </p>
                 <br/>
             </div>
@@ -250,7 +250,9 @@
       //      var repetitions = 20;
             var heights = [0.2, 0.4, 0.6, 0.8,1];//cm
             var amplitudes = [3, 6, 9];//cm
-            var repetitions = 2;
+            const ABANDON_NUM = 1;
+            var repetitions = 10+ABANDON_NUM;
+            
            // var heights = [10, 20, 40,80,160];//px
            // var amplitudes = [40, 80, 160];//px
             // ***
@@ -271,6 +273,7 @@
             var first_ribbon_is_active = false;
             var results = new Object;
             var isFirstTest = true;
+           
             
             //Device characteristics
             var physical_width;
@@ -304,6 +307,8 @@
             //var exp_first_time = $.now();
             //var exp_time;
             var cursorOnTarget = 0;
+            var stopLog = false;//the last target was hitted .test finish
+            var pointNum = 0;
             var isHit = 0;
             //touch point location
             var p1x = 0;
@@ -330,11 +335,14 @@
                 total_error_count = 0;
                 first_ribbon_is_active = false;
                 isFirstTest = false;
+                stopLog = false;
 
                 //for log
                 exp_num = 0;
                 cursorOnTarget = 0;
                 isHit = 0;
+                //stopLog = false;
+                pointNum = 0;
                 //touch point location
                 p1x = 0;
                 p1y = 0;
@@ -480,6 +488,9 @@
 				
                 hideKeyboard();
 				 $("#start-overlay").hide();
+                
+                 
+
 				 populateTrials();
                 // setTimeout(function() {
                     // $("#start-overlay").hide();
@@ -590,7 +601,7 @@
                 
                 //Begin the presentTrial recursion
                 $("#test-container").show();
-                bugout.log("inputNum testNo trialName cur_repetition onTarget hit name type x1 y1 x2 y2 time cur_start_time");
+                bugout.log("inputNum testNo trialName cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 time cur_start_time");
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
                     $("#test-container").unbind().bind('vmouseup',trialClick);
@@ -604,8 +615,13 @@
 
                      mc.get('pinch').set({ enable: true });
 					//move cursor
-					 mc.on("pinch",function(ev){
-					 	$('#cursor').css('top',ev.center.y +'px');
+					 mc.on("hammer.input",function(ev){
+                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
+                        //for log    
+                        pointNum = ev.pointers.length;    
+                        //make sure input is pinch
+                        if (ev.pointers.length != 2) return;
+                        $('#cursor').css('top',ev.center.y +'px');
                          //for log, record location for touch point
                         p1x = ev.pointers[0].x;
                         p1y = ev.pointers[0].y;
@@ -637,15 +653,17 @@
 					// 	$('#cursor').css('display','none');
 					// });
 
-					mc.on("pinch",trialPinch);
+					mc.on("hammer.input",trialPinch);
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
 					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
 					// else alert("Wrong gesture type!");
-                    setInterval(writeLog, 100)//
+                    writeLogInt = setInterval(writeLog, 100);//
 					
 				}                  
 				cur_repetition = 15;
                 cur_trial = dummy;
+                //for log
+                stopLog = false;//start log
                 presentTrial(dummy);
 				
                 
@@ -664,7 +682,7 @@
                         $("#trial-overlay").text("Practice");
                     }
                     else {
-                        $("#trial-overlay").text("Test #"+(total_repetitions+1));
+                        $("#trial-overlay").text(cur_trial.name+" Test #"+(total_repetitions+1));
                     }
                     presentTrial(cur_trial);
                 }
@@ -726,7 +744,7 @@
                     $("#trial-overlay").text("Practice");
                 }
                 else {
-                    $("#trial-overlay").text("Test #"+(total_repetitions+1));
+                    $("#trial-overlay").text(cur_trial.name+" Test #"+(total_repetitions+1));
                 }
                 
                
@@ -819,7 +837,7 @@
                 p1y = y;
                 p2x = -1;
                 p2y = -1;
-                
+                pointNum = 1;
                
                 if(correctScreenRegion)
                 {
@@ -862,9 +880,9 @@
                 var y;
                 y = ev.center.y;
                 
-                               		
+                            		
                // $('#cursor').css('top',ev.center.y+'px');        //move cursor    
-                $("#debug-overlay").text(ev.type+":x="+ev.center.x+";y="+ev.center.y);                       
+                                     
                 //split the screen down the middle and reject things on the wrong side
                 //var tap_in_top_half = y < window_height/2;
                 
@@ -886,17 +904,23 @@
                         countDownTimer = setTimeout(function(){
                         if(countDownStartAndOverlay)
                         {  
-                        
+                           
                             //fo log
                             isHit = 1;
                             writeLog(); //writlog must before trialHit
                             isHit = 0;
+                            if( trials.length == 0)
+                            {
+                              stopLog = true; 
+                              clearInterval(writeLogInt);//stopwrite log
+                            }
                             trialHit();
+                            
                             
                         }
                         
 
-                    }, pinchWaitTime);
+                        }, pinchWaitTime);
                     
                     }						
                                         
@@ -905,7 +929,7 @@
                 {
                 
                     
-                   // if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
+                    if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
                     countDownStartAndOverlay = false;
                 }
                 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
@@ -917,7 +941,7 @@
 
             function writeLog()
             {
-
+                if(stopLog)return;
                var minY = parseInt($(".target").css('top'));
                var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                var y;
@@ -934,7 +958,7 @@
                     else
                         cursorOnTarget = 0;
                     //exp_distance = Math.sqrt(Math.pow((ev.pointers[0].clientX - ev.pointers[1].clientX),2)+Math.pow((ev.pointers[0].clientY - ev.pointers[1].clientY),2));
-                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+String($.now())+" "+cur_start_time;
+                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+String($.now())+" "+cur_start_time;
                     //export finger location message
                     //bugout.log("number x1 y1 x2 y2 time distance");
                     bugout.log(line);
@@ -1007,7 +1031,10 @@
             function presentResults() {
 
                 if($('#type option:selected').val()==='tap')$("#test-container").unbind();
-                clearInterval(writeLog);
+                stopLog = true;
+                clearInterval(writeLogInt);
+                
+                
 
                 if( $("#results-overlay").is(':visible'))return;
                 $("#results-overlay").hide();
@@ -1044,13 +1071,17 @@
                     }
                     else {
                         for (var j=0; j<result_rows.length; j++) {
-                            row = result_rows[j];
-                            duration = duration + row.time;
-                            if (!row.hit) {
-                                num_error++;
+                            //abandon strat trial data
+                            if(j>=ABANDON_NUM)
+                            {
+                                row = result_rows[j];
+                                duration = duration + row.time;
+                                if (!row.hit) {
+                                    num_error++;
+                                }
                             }
                         }
-                        data.push(duration / result_rows.length);
+                        data.push(duration / (result_rows.length-ABANDON_NUM));
                       //  data.push((num_error / result_rows.length) * 100.0);//do not show error rate
                     }
                 }
