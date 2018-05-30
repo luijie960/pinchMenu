@@ -294,9 +294,9 @@
 				// $('#cursor').css('top',ev.center.y+'px');
 			// });//move cursor
 			
-			var pinchWaitTime = 500;//ms
-			var countDownStartAndOverlay = false; 
-			var countDownTimer;
+			const PINCH_WAIT_TIME = 5;//at 100ms  5 for 5*100ms
+			var overlayTimeCount = 0; 
+			var isOnTarget = false;//cursor in target
             //debug log    	
             var bugout = new debugout();
             var exp_num = 0;
@@ -304,7 +304,7 @@
             //var exp_first_time = $.now();
             //var exp_time;
             var cursorOnTarget = 0;
-            var isHit = 0;
+           
             //touch point location
             var p1x = 0;
             var p1y = 0;
@@ -334,7 +334,7 @@
                 //for log
                 exp_num = 0;
                 cursorOnTarget = 0;
-                isHit = 0;
+                
                 //touch point location
                 p1x = 0;
                 p1y = 0;
@@ -641,7 +641,7 @@
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
 					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
 					// else alert("Wrong gesture type!");
-                    setInterval(writeLog, 100)//
+                    setInterval(intervalDo, 100);//
 					
 				}                  
 				cur_repetition = 15;
@@ -650,7 +650,34 @@
 				
                 
             }
-            
+            function intervalDo()
+            {//count holding time for pinch 
+                if(isOnTarget)
+                {
+                    if(overlayTimeCount<PINCH_WAIT_TIME+10)//<PINCH_WAIT_TIME+10:prevent overload 
+                        overlayTimeCount++;
+
+                    if(overlayTimeCount===PINCH_WAIT_TIME)
+                    {  
+                    
+                        //fo log
+                        
+                        writeLog(1); //writlog must before trialHit
+                        
+                        trialHit();//successfully  hit
+                        
+                    }
+                }
+                else
+                {
+                    overlayTimeCount = 0;
+                    writeLog(0);
+                }
+               
+
+              
+
+            }
             function queueNextTrial() {
                 
                 total_repetitions++;
@@ -771,8 +798,8 @@
                 cur_start_time = $.now();
                 cur_error_count = 0;
 
-                //for log
-                isHit = 0;
+                
+                
 				
                 
             }
@@ -826,26 +853,22 @@
                     if (y >= minY && y <= maxY) {
                        
                         //for log
-                        
-                        isHit = 1;
-                       
-                        writeLog();
+                                               
+                        writeLog(1);
 
                         trialHit();
                     }
                     else {
                         //for log
-                    
-                        isHit = 0;
-                        
-                        writeLog();
+                                          
+                        writeLog(0);
                     //  trialMiss();//must hit target
                     
                     }
                 }
                 else
-                {       isHit = 0;
-                        writeLog();
+                {      
+                        writeLog(0);
 
 
                 }
@@ -880,42 +903,39 @@
                 var minY = parseInt($(".target").css('top'));
                 var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                 if(y >= minY && y <= maxY){
-                    if(!countDownStartAndOverlay)//strart timer
-                    {countDownStartAndOverlay = true;
-                        //clearTimeout(countDownTimer);
-                        countDownTimer = setTimeout(function(){
-                        if(countDownStartAndOverlay)
-                        {  
-                        
-                            //fo log
-                            isHit = 1;
-                            writeLog(); //writlog must before trialHit
-                            isHit = 0;
-                            trialHit();
-                            
-                        }
-                        
-
-                    }, pinchWaitTime);
+                    isOnTarget = true;
+                                      
+                    // if(overlayTimeCount>PINCH_WAIT_TIME)
+                    // {  
                     
-                    }						
+                    //     //fo log
+                        
+                    //     writeLog(1); //writlog must before trialHit
+                        
+                    //     trialHit();//successfully  hit
+                        
+                    // }                       
+                   
+                    
+                    						
                                         
                 }
                 else 
                 {
                 
                     
-                   // if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
-                    countDownStartAndOverlay = false;
+                   // if(overlayTimeCount&&countDownTimer)clearTimeout(countDownTimer);
+                   isOnTarget = false;
+                   
                 }
-                //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
+                //$("#debug-overlay").text("overlayTimeCount"+overlayTimeCount); 
             } 
 
 			function overlapCursorJudge(){
 				
 			}
 
-            function writeLog()
+            function writeLog(isHit)
             {
 
                var minY = parseInt($(".target").css('top'));
@@ -1007,7 +1027,7 @@
             function presentResults() {
 
                 if($('#type option:selected').val()==='tap')$("#test-container").unbind();
-                clearInterval(writeLog);
+                clearInterval(intervalDo);
 
                 if( $("#results-overlay").is(':visible'))return;
                 $("#results-overlay").hide();
