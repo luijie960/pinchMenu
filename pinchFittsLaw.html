@@ -11,7 +11,7 @@
         <script src="https://hammerjs.github.io/dist/hammer.js"></script> 
 	<script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
         <script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
-	    <script src="http://inorganik.github.io/debugout.js/debugout.js"></script>
+	    <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
         <style>
 		
 		.cursor {	   
@@ -211,10 +211,10 @@
             </div>
             <br/>
             <br/>
-            <button id="save-file" style ="width:200px">saveToFile</button>
+            <button id="save-file" style ="width:200px">saveToFiles</button>
             <br/>
             <br>
-            <button id="download-log" style ="width:200px">downloadLog</button>
+            <button id="download-log" style ="width:200px;display:none;" >downloadLog</button>
             <br/>
             <button id="restart" style ="width:200px">Back</button>
             <br/>
@@ -310,19 +310,24 @@
             var stopLog = false;//the last target was hitted .test finish
             var pointNum = 0;
             var isHit = 0;
+            var writeLogInt;//store handle for writeLog function 
             //touch point location
             var p1x = 0;
             var p1y = 0;
             var p2x = 0;
             var p2y = 0;
+            var centerY = 0;//record touch point center
 
             //click function for result-overlay
             $('#save-file').click(function(){
-                    $('#results-table').tableExport({fileName:$("#name").val()+'-'+$.now(),type:'csv'});
-                   alert('saving!');                
+                    var time = $.now();
+                    $('#results-table').tableExport({fileName:$("#name").val()+'-'+time,type:'csv'});
+                    bugout.downloadLog($("#name").val()+'-'+time);
+                    exitFullscreen();
+                                  
                     }) ;
             //click function for log-download 
-            $('#download-log').click(function(){bugout.downloadLog();
+            $('#download-log').click(function(){bugout.downloadLog($("#name").val()+'-'+$.now());
                 exitFullscreen();
                 });
             //do test again
@@ -348,7 +353,8 @@
                 p1y = 0;
                 p2x = 0;
                 p2y = 0;
-                
+                centerY = 0;
+
                 $("#cursor").css("display","none");
                 $("#start_button").click(submitSetup);
                 $("#start_button").prop("disabled",false);
@@ -601,7 +607,7 @@
                 
                 //Begin the presentTrial recursion
                 $("#test-container").show();
-                bugout.log("inputNum testNo trialName cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 time cur_start_time");
+                bugout.log("inputNum testNo trialName cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 cursorY centerY time cur_start_time");
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
                     $("#test-container").unbind().bind('vmouseup',trialClick);
@@ -618,7 +624,8 @@
 					 mc.on("hammer.input",function(ev){
                         $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
                         //for log    
-                        pointNum = ev.pointers.length;    
+                        pointNum = ev.pointers.length;
+                        centerY =   ev.center.y;  
                         //make sure input is pinch
                         if (ev.pointers.length != 2) return;
                         $('#cursor').css('top',ev.center.y +'px');
@@ -945,9 +952,11 @@
                var minY = parseInt($(".target").css('top'));
                var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                var y;
+               var x;
                if($('#type option:selected').val()==='tap')
                {//for tap
                     y = p1y;
+                    centerY = p1y;
                }
                else
                {                
@@ -958,7 +967,7 @@
                     else
                         cursorOnTarget = 0;
                     //exp_distance = Math.sqrt(Math.pow((ev.pointers[0].clientX - ev.pointers[1].clientX),2)+Math.pow((ev.pointers[0].clientY - ev.pointers[1].clientY),2));
-                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+String($.now())+" "+cur_start_time;
+                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+y+" "+centerY+" "+String($.now())+" "+cur_start_time;
                     //export finger location message
                     //bugout.log("number x1 y1 x2 y2 time distance");
                     bugout.log(line);
