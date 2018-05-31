@@ -297,7 +297,7 @@
 				// $('#cursor').css('top',ev.center.y+'px');
 			// });//move cursor
 			
-		    const PINCH_WAIT_TIME = 500;//ms
+			var pinchWaitTime = 500;//ms
 			var countDownStartAndOverlay = false; 
 			var countDownTimer;
             //debug log    	
@@ -306,13 +306,9 @@
             //var exp_distance = 0;
             //var exp_first_time = $.now();
             //var exp_time;
-<<<<<<< HEAD
             var cursorOnTarget = 0;
             var stopLog = false;//the last target was hitted .test finish
             var pointNum = 0;
-=======
-            var scursorOnTarget = 0;
->>>>>>> caa7c2bb14ff18b4d69131616a33911933a98fe0
             var isHit = 0;
             //touch point location
             var p1x = 0;
@@ -332,14 +328,7 @@
             //do test again
             $('#restart').click(function(){
                 
-                initForTest()
-             });
-            $('#exit').click(function(){
-                exitFullscreen();
-            });
-			
-            function initForTest()
-            {
+                
                 cur_repetition = 0;
                 trial_flash_queued = false;
                 total_repetitions = -1;
@@ -352,12 +341,8 @@
                 exp_num = 0;
                 cursorOnTarget = 0;
                 isHit = 0;
-<<<<<<< HEAD
                 //stopLog = false;
                 pointNum = 0;
-=======
-                countDownStartAndOverlay = false;
->>>>>>> caa7c2bb14ff18b4d69131616a33911933a98fe0
                 //touch point location
                 p1x = 0;
                 p1y = 0;
@@ -370,7 +355,13 @@
                 $("#start_button").text("start");
                 $("#results-overlay").hide();
                 $("#start-overlay").show();
-            }
+
+            });
+            $('#exit').click(function(){
+                exitFullscreen();
+            });
+			
+
 			// Find the right method, call on correct element
 			function launchIntoFullscreen() {
 				//var elem = document.getElementById('test-container');
@@ -800,7 +791,7 @@
 
                 //for log
                 isHit = 0;
-				//overlapCursorJudge();
+				
                 
             }
             
@@ -893,44 +884,30 @@
                // $('#cursor').css('top',ev.center.y+'px');        //move cursor    
                                      
                 //split the screen down the middle and reject things on the wrong side
-                var tap_in_top_half = y < window_height/2;
+                //var tap_in_top_half = y < window_height/2;
                 
-                if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
-                    return;
-                }
-                else if (!first_ribbon_is_active && tap_in_top_half) {
-                   return;
-                }
+                // if (first_ribbon_is_active && !tap_in_top_half) {  //could do first_ribbon_is_active === !tap_in_left_half
+                //    // return;
+                // }
+                // else if (!first_ribbon_is_active && tap_in_top_half) {
+                //   // return;
+                // }
                 
-               overlapCursorJudge();
-            } 
-
-			function overlapCursorJudge(){
-				var y = parseInt($('#cursor').css('top'));
-                                     
-				
-				//find out where active bar is located
-				var minY = parseInt($(".target").css('top'));
+                var y = parseInt($('#cursor').css('top'));
+                //find out where active bar is located
+                var minY = parseInt($(".target").css('top'));
                 var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
                 if(y >= minY && y <= maxY){
                     if(!countDownStartAndOverlay)//strart timer
-<<<<<<< HEAD
                     {countDownStartAndOverlay = true;
                         //clearTimeout(countDownTimer);
                         countDownTimer = setTimeout(function(){
                         if(countDownStartAndOverlay)
                         {  
-=======
-					{countDownStartAndOverlay = true;
-					 countDownTimer = setTimeout(function(){
-                         if(countDownStartAndOverlay)
-                         {  
->>>>>>> caa7c2bb14ff18b4d69131616a33911933a98fe0
                            
                             //fo log
                             isHit = 1;
                             writeLog(); //writlog must before trialHit
-<<<<<<< HEAD
                             isHit = 0;
                             if( trials.length == 0)
                             {
@@ -960,26 +937,6 @@
 
 			function overlapCursorJudge(){
 				
-=======
-                            
-                            trialHit();
-                            
-                         }
-                         
-
-                     }, PINCH_WAIT_TIME);
-					 
-					}						
-					                       
-                }
-                else 
-				{
-                   
-					countDownStartAndOverlay = false;
-					if(countDownStartAndOverlay)clearTimeout(countDownTimer);
-				}
-				 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
->>>>>>> caa7c2bb14ff18b4d69131616a33911933a98fe0
 			}
 
             function writeLog()
