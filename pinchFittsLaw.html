@@ -9,9 +9,10 @@
         <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="https://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="https://hammerjs.github.io/dist/hammer.js"></script> 
-	<script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
-        <script type="text/javascript" src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
-	    <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
+	    <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
+        <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
+        <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
+        <script src="http://raw.githack.com/carhartl/jquery-cookie/master/src/jquery.cookie.js"></script>
         <style>
 		
 		.cursor {	   
@@ -167,17 +168,18 @@
             <p>
                 Guesture  Type:
                 <select id="type">
+                    <option value="tap">tap</option>
                     <option value="pinchIn">pinchIn</option>
                     <option value="pinchOut">pinchOut</option>
-                    <option value="tap">tap</option>
+                    
                 </select>
                 <br/>
                 
-                <input id="physicalSizeN" type="radio" name="physicalSize" value="no" onclick='$("#physicalSizeInput").hide();'  checked> 
-                <input id="physicalSizeY" type="radio" name="physicalSize" value="yes" onclick='$("#physicalSizeInput").show();' > 
+                <input id="physicalSizeN" type="radio" name="physicalSize" value="no" onclick='$("#physicalSizeInput").hide();'  > 
+                <input id="physicalSizeY" type="radio" name="physicalSize" value="yes" onclick='$("#physicalSizeInput").show();' checked> 
                 <label for="physicalSizeN" >without physical size</label> 
                 <label for="physicalSizeY" >with physical size</label>
-                <div id="physicalSizeInput" style="display:none">  
+                <div id="physicalSizeInput" style="display:block">  
                 <br/>
                 Device (i.e. touchpad, mouse...): <input id="device" type="text" value="phone" onfocus="if(value==='phone')value=''" onblur="if(value==='')value='phone'">
                 </p>
@@ -186,7 +188,7 @@
                 <p >Please measure the width and height of your screen using a ruler so we can accurately scale the test.</p>
                  <p>
                 Width (centimeters):
-                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.15')value=''" onblur="if(value==='')value='6.15'">
+                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.15')value=''" onblur="if(value==='')value='6.15'" autocomplete = "on">
                     <br/>
                 Height (centimeters):
                 <input id="height" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="11" onfocus="if(value==='11')value=''" onblur="if(value==='')value='11'">
@@ -251,7 +253,7 @@
             var heights = [0.2, 0.4, 0.6, 0.8,1];//cm
             var amplitudes = [3, 6, 9];//cm
             const ABANDON_NUM = 1;
-            var repetitions = 10+ABANDON_NUM;
+            var repetitions = 1+ABANDON_NUM;
             
            // var heights = [10, 20, 40,80,160];//px
            // var amplitudes = [40, 80, 160];//px
@@ -317,12 +319,17 @@
             var p2x = 0;
             var p2y = 0;
             var centerY = 0;//record touch point center
-
+            //load local store cookie to input element   
+            $("#width").val(localStorage.getItem("physical_width"));
+            $("#height").val(localStorage.getItem("physical_height"));
+            $("#device").val(localStorage.getItem("device_type"));
+            
             //click function for result-overlay
             $('#save-file').click(function(){
-                    var time = $.now();
-                    $('#results-table').tableExport({fileName:$("#name").val()+'-'+time,type:'csv'});
-                    bugout.downloadLog($("#name").val()+'-'+time);
+                   // var time = $.now();
+                    var d = new Date();
+                    $('#results-table').tableExport({fileName:$("#name").val()+'-'+d.toLocaleString(),type:'csv'});
+                    bugout.downloadLog($("#name").val()+'-'+d.toLocaleString());
                     exitFullscreen();
                                   
                     }) ;
@@ -366,7 +373,7 @@
             $('#exit').click(function(){
                 exitFullscreen();
             });
-			
+		
 
 			// Find the right method, call on correct element
 			function launchIntoFullscreen() {
@@ -393,19 +400,7 @@
 					// alert("orientation lock failed")
 					// }	
 			}
-            function exitFullscreen() {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
-                    } else if (document.mozCancelFullScreen) {
-                        document.mozCancelFullScreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    }
-                    }
-
-          
+            
             function isFull() {
                 var fullscreenElement =
                     document.fullscreenEnabled
@@ -422,6 +417,18 @@
                     return true;
                 }
             }
+          
+          function exitFullscreen() {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                    }
                
             function submitSetup(event) {
                 event.stopPropagation();
@@ -471,7 +478,10 @@
                             scalefactor_y = 50;//set to fix value
                             // scalefactor_y = window.devicePixelRatio;//set to fix value
 							// scalefactor_x = resolution_width / physical_width;
-                
+                //store the input  physical as cookie           
+                localStorage.setItem("physical_width", $('#width').val());     
+                localStorage.setItem("physical_height", $('#height').val()); 
+                localStorage.setItem("device_type", $('#device').val());          
                 
                 //add debug info
                 $("#debug").append($("<li></li>").text("devicePixelRatio: "+scalefactor_y));
