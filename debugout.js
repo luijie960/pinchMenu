@@ -81,7 +81,7 @@ function debugout() {
 		return segment.join('\n');
 	}
 	// immediately downloads the log - for desktop browser use
-	this.downloadLog = function(var fileName) {
+	this.downloadLog = function(fileName) {
 	    var file = "data:text/plain;charset=utf-8,";
 	    var logFile = self.getLog();
 	    var encoded = encodeURIComponent(logFile);
