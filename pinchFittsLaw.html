@@ -208,7 +208,7 @@
         
         <div id="results-overlay">
             <h3>Here are the results of your Fitts' law tests.</h3>
-            <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10_X_20 would mean that the ribbons were 10cm*scaleFactor pt(logic point) wide, and 20cm*scalefactor pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
+            <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10X20 would mean that the ribbons were 10cm*scaleFactor pt(logic point) wide, and 20cm*scalefactor pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
             <p id="" value='scaleFactor'></p>
             <div id="results-table">
                  <table id="table-elem">
@@ -608,7 +608,7 @@
                         
                         //trials are dicts that contain trial information
                         var trial = new Object;
-                        trial.name = height + "_X_" + amplitude;
+                        trial.name = height + "X" + amplitude;
                         trial.height = height;
                         trial.amplitude = amplitude;
                         console.log(window_height+";"+mod_amplitude+";"+mod_height+";"+scalefactor_y+";"+amplitude+";"+height+";");
@@ -642,7 +642,7 @@
                 
                 //Begin the presentTrial recursion
                 $("#test-container").show();
-                bugout.log("inputNum testNo trialName cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 cursorY centerY time cur_start_time");
+                bugout.log("No testNo width distance cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 cursorY centerY time cur_start_time");
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
                     $("#test-container").unbind().bind('vmouseup',trialClick);
@@ -699,7 +699,7 @@
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
 					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
 					// else alert("Wrong gesture type!");
-                    writeLogInt = setInterval(writeLog, 100);//ms
+                    writeLogInt = setInterval(writeLog, 30);//ms
 					
 				}                  
 				cur_repetition = 15;
@@ -997,12 +997,14 @@
                {                
                     y = parseInt($('#cursor').css('top'));
                 }
-                    if(y>=minY&&y<=maxY)
-                        cursorOnTarget = 1;
-                    else
-                        cursorOnTarget = 0;
+                if(y>=minY&&y<=maxY)
+                    cursorOnTarget = 1;
+                else
+                    cursorOnTarget = 0;
+                cur_trial.width
+
                     //exp_distance = Math.sqrt(Math.pow((ev.pointers[0].clientX - ev.pointers[1].clientX),2)+Math.pow((ev.pointers[0].clientY - ev.pointers[1].clientY),2));
-                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.name+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+y+" "+centerY+" "+String($.now())+" "+cur_start_time;
+                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.height+" "+cur_trial.amplitude+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+y+" "+centerY+" "+String($.now())+" "+cur_start_time;
                     //export finger location message
                     //bugout.log("number x1 y1 x2 y2 time distance");
                     bugout.log(line);
