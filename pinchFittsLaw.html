@@ -211,8 +211,12 @@
             <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10X20 would mean that the ribbons were 10cm*scaleFactor pt(logic point) wide, and 20cm*scalefactor pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
             <p id="" value='scaleFactor'></p>
             <div id="results-table">
-                 <table id="table-elem">
-                 </table>
+                <table id="table-elem">
+                </table>
+
+                <table id="detailTable-elem">
+                </table>
+                
             </div>
             <br/>
             <br/>
@@ -256,7 +260,7 @@
             var heights = [0.2, 0.4, 0.6, 0.8,1];//target hight cm
             var amplitudes = [3, 6, 9];//target distance  cm
             const ABANDON_NUM = 1;// For each group of width*distance experiments, the first ABANDON_NUM of experimental data is invalid and will be abandoned. when 0 means all data is valid
-            var repetitions = 10+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
+            var repetitions = 4+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
             
            // var heights = [10, 20, 40,80,160];//px
            // var amplitudes = [40, 80, 160];//px
@@ -326,6 +330,7 @@
                    // var time = $.now();
                     var d = new Date();
                     $('#results-table').tableExport({fileName:$("#name").val()+'-'+d.toLocaleString(),type:'csv'});
+                    
                     bugout.downloadLog($("#name").val()+'-'+d.toLocaleString());
                     exitFullscreen();
                                   
@@ -1065,6 +1070,8 @@
                 result.repetition = cur_repetition;
                 result.hit = was_hit;
                 result.time = diff;
+                result.height = cur_trial.height;
+                result.amplitude = cur_trial.amplitude;
                 
                 //If the results dict does not yet have a list, make one
                 if (!results.hasOwnProperty(cur_trial.name)) {
@@ -1099,7 +1106,8 @@
                 var total_error_rate = (parseFloat(total_error_count) / total_repetitions) * 100.0;
                 
                 //build results table
-                var headers = ["Name","InputType","Width","Height","Total_Time(ms)","Total_Error(%)"];
+                var headers = ["Name","InputType","phy_Width","phy_Height","Total_Time(ms)","Total_Error(%)"];
+                var detailHeaders = ["No","Name","InputType","targetWidth","targetHeight","curRepetition","TimeCost(ms)"];
                 for (var i=0; i<sorted_trial_names.length; i++) {
                     trial = sorted_trial_names[i];
                     headers.push(trial+"_Avg_Time(ms)");
@@ -1107,6 +1115,8 @@
                 }
                 
                 var data = [name, inputType, physical_width, physical_height, total_time_spent, total_error_rate];
+                var detailDatas = [];//store the detail data result for all repetitions
+                var num = 0;
                 for (var i=0; i<sorted_trial_names.length; i++) {
                     result_rows = results[sorted_trial_names[i]];
                     duration = 0.0;
@@ -1119,24 +1129,41 @@
                         for (var j=0; j<result_rows.length; j++) {
                             //abandon strat trial data
                             if(j>=ABANDON_NUM)
-                            {
+                            {   num++;
                                 row = result_rows[j];
                                 duration = duration + row.time;
                                 if (!row.hit) {
                                     num_error++;
                                 }
+                                //write detail data for each repetition
+                                var detailData = [0,name,inputType,0,0,0,0];//
+                                detailData[0] = num;
+                                detailData[3] = row.height;
+                                detailData[4] = row.amplitude;
+                                detailData[5] = row.repetition;
+                                detailData[6] = row.time;
+
+                                detailDatas[detailDatas.length]=detailData;
                             }
                         }
                         data.push(duration / (result_rows.length-ABANDON_NUM));
                       //  data.push((num_error / result_rows.length) * 100.0);//do not show error rate
+
+                      
                     }
                 }
                 
                 //build results html
                 if(isFirstTest)
-                $("#results-table").append(makeTable(data,headers));
+                {
+                    $("#results-table").append(makeTable(data,headers));
+                    $("#results-table").append(makeDetailTable(detailDatas,detailHeaders));
+                }
                 else
-                $("#results-table").append(makeTable(data));
+                {
+                     $("#results-table").append(makeTable(data));
+                     $("#results-table").append(makeDetailTable(detailDatas));
+                }
 
 
                 //$("#results-file-container").append(makeCSV(headers,data));
@@ -1164,6 +1191,29 @@
                     data_tr.append( $("<td></td>").text(data[i]) );
                 }
                 table.append(data_tr)
+                
+                return table;
+            }
+
+             function makeDetailTable(data,headers) {
+                //var table = $("<table></table>")
+                var table = $("#detailTable-elem");
+                if(arguments[1])//if have two arguments,use the second as head
+                {   var header_tr = $("<tr></tr>")
+                    for (var i=0; i<headers.length; i++) {
+                        header_tr.append( $("<th></th>").text(headers[i]) );
+                    }
+                    table.append(header_tr)
+                }
+
+               
+                for (var i=0; i<data.length; i++) {
+                    var data_tr = $("<tr></tr>")
+                    for(var j=0;j<data[j].length;j++)
+                    data_tr.append( $("<td></td>").text(data[i][j]) );
+                    table.append(data_tr)
+                }
+                
                 
                 return table;
             }
