@@ -139,25 +139,26 @@
                 
                 
             }
-            
             .ribbon {
                 position: fixed;
                 top: 0px;
                 height: 50px;
                 width: 100%;
-                background-color: #999999;
-            }
-            .ribbon.target {
-                background-color: #3399ff;
+                background-color: #1c7045;
                 opacity:0.5
             }
+            .ribbon.target {
+                background-color: #f10a0a;
+                opacity:1
+            }
             .ribbon.target.hover {
-                color: #FFF;
+                background-color: #08f592;
                 opacity:1
             }
             .smaller {
                 font-size: smaller;
             }
+           
             
         </style>
         
@@ -260,7 +261,7 @@
             var heights = [0.2, 0.4, 0.6, 0.8,1];//target hight cm
             var amplitudes = [3, 6, 9];//target distance  cm
             const ABANDON_NUM = 1;// For each group of width*distance experiments, the first ABANDON_NUM of experimental data is invalid and will be abandoned. when 0 means all data is valid
-            var repetitions = 4+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
+            var repetitions = 1+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
             
            // var heights = [10, 20, 40,80,160];//px
            // var amplitudes = [40, 80, 160];//px
@@ -274,8 +275,8 @@
             var sorted_trial_names;
             var cur_trial;
             var cur_repetition = 0;
-            var cur_start_time;
-            var cur_count_start_time; 
+            var cur_start_time = 0;
+            var cur_count_start_time =-10 ; 
            
             var trial_flash_queued = false;
             var total_repetitions = -1;//practice one times
@@ -346,15 +347,25 @@
                 
                 
                 cur_repetition = 0;
+                cur_start_time = 0;
+                cur_count_start_time = -1; 
+
                 trial_flash_queued = false;
-                total_repetitions = -1;
+                total_repetitions = -1;//practice one times
                 total_error_count = 0;
+                total_start_time = 0;
                 first_ribbon_is_active = false;
                 isFirstTest = false;
                 stopLog = false;
+                results = new Object;//clear results;
+                      
+          
+          
+            
+                countDownStartAndOverlay = false;
 
                 //for log
-                exp_num = 0;
+                //exp_num = 0;//keep increaseing for multiple test
                 cursorOnTarget = 0;
                 isHit = 0;
                 //stopLog = false;
@@ -668,8 +679,27 @@
                         //for log    
                         pointNum = ev.pointers.length;
                         centerY =   ev.center.y;  
+                        
+                        
                         //make sure input is pinch
-                        if (ev.pointers.length != 2) return;
+                        if (ev.pointers.length < 2) 
+                        {   if(ev.pointers.length==1)
+                            {
+                                var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
+                                var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
+                                if(d1<d2)
+                                {
+                                    p1x = ev.pointers[0].x;
+                                    p1y = ev.pointers[0].y;
+                                }
+                                else
+                                {
+                                    p2x = ev.pointers[0].x;
+                                    p2y = ev.pointers[0].y;
+                                }
+                            }
+                            return;
+                        }
                         $('#cursor').css('top',ev.center.y +'px');
                          //for log, record location for touch point
                         p1x = ev.pointers[0].x;
@@ -968,6 +998,7 @@
                             
                             
                         }
+                        else  cur_count_start_time = -2;
                         
 
                         }, pinchWaitTime);
@@ -981,7 +1012,7 @@
                     
                     if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
                     countDownStartAndOverlay = false;
-                    cur_count_start_time = 0;
+                    cur_count_start_time = -3;
                 }
                 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
             } 
@@ -1030,12 +1061,12 @@
                
 
                 //flash to show hit and queue the next one
-                $(".target").css("backgroundColor","#33cc33");
-                trial_flash_queued = true;
-                setTimeout(function() {
-                    $(".ribbon").css("backgroundColor","");
-                    trial_flash_queued = false;
-                }, flash_delay);
+                // $(".target").css("backgroundColor","#33cc33");
+                // trial_flash_queued = true;
+                // setTimeout(function() {
+                //     $(".ribbon").css("backgroundColor","");
+                //     trial_flash_queued = false;
+                // }, flash_delay);
                 
                 queueNextTrial();
                 
@@ -1054,12 +1085,12 @@
                 
                 
                 //flash to show miss and queue the next one
-                $(".target").css("backgroundColor","#cc3333");
-                trial_flash_queued = true;
-                setTimeout(function() {
-                    $(".ribbon").css("backgroundColor","");
-                    trial_flash_queued = false;
-                }, flash_delay);
+                // $(".target").css("backgroundColor","#cc3333");
+                // trial_flash_queued = true;
+                // setTimeout(function() {
+                //     $(".ribbon").css("backgroundColor","");
+                //     trial_flash_queued = false;
+                // }, flash_delay);
 
                 
                 queueNextTrial();
@@ -1080,6 +1111,7 @@
                 result.endTime = end_time;
                 result.countStartTime = cur_count_start_time;
                 result.logNo = exp_num;
+                result.inputType = $("#type").val();
                 
                 //If the results dict does not yet have a list, make one
                 if (!results.hasOwnProperty(cur_trial.name)) {
@@ -1135,16 +1167,17 @@
                     }
                     else {
                         for (var j=0; j<result_rows.length; j++) {
+                            row = result_rows[j];
                             //abandon strat trial data
-                            if(j>=ABANDON_NUM)
-                            {   num++;
-                                row = result_rows[j];
+                            if(row.repetition>=ABANDON_NUM)
+                            {   num++;                                
                                 duration = duration + row.time;
                                 if (!row.hit) {
                                     num_error++;
                                 }
                                 //write detail data for each repetition
-                                var detailData = [num,name,inputType,0,0,0,0,0,0,0,0];//
+                                var detailData = [num,name,0,0,0,0,0,0,0,0,0];//
+                                detailData[2] = row.inputType;
                                 detailData[3] = row.logNo;
                                 detailData[4] = row.height;
                                 detailData[5] = row.amplitude;
@@ -1154,7 +1187,7 @@
                                 detailData[9] = row.endTime;
                                 detailData[10] = row.time;
 
-                                detailDatas[detailDatas.length]=detailData;
+                                detailDatas.push(detailData);
                             }
                         }
                         data.push(duration / (result_rows.length-ABANDON_NUM));
@@ -1175,7 +1208,8 @@
                      $("#results-table").append(makeTable(data));
                      $("#results-table").append(makeDetailTable(detailDatas));
                 }
-
+                
+                
 
                 //$("#results-file-container").append(makeCSV(headers,data));
 
