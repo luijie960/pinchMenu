@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
-        <script src="http://hammerjs.github.io/dist/hammer.js"></script> 
+        <script src="http://hammerjs.github.io/dist/hammer.min.js"></script> 
 	    <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
         <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
         <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
@@ -24,9 +24,10 @@
 							position:relative;
 							z-index:100;
 							pointer-events:none;
-							display:block;
-							color:#0000ff;
+							display:inline-block;
 							margin:0px;
+                            border-top: 1px solid #a200ff;
+                            
 							
 							
 						}
@@ -164,7 +165,7 @@
         
     </head>
     <body >
-        <hr id="cursor" class="cursor"/>
+        <div id="cursor" class="cursor"></div>
         
         <div id="start-overlay" class="centered">
             <h3>Welcome to the Fitts' Law Testing App</h3>
@@ -192,10 +193,10 @@
                 <p >Please measure the width and height of your screen using a ruler so we can accurately scale the test.</p>
                  <p>
                 Width (centimeters):
-                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.15')value=''" onblur="if(value==='')value='6.15'" autocomplete = "on">
+                <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.8')value=''" onblur="if(value==='')value='6.8'" autocomplete = "on">
                     <br/>
                 Height (centimeters):
-                <input id="height" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="11" onfocus="if(value==='11')value=''" onblur="if(value==='')value='11'">
+                <input id="height" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="11" onfocus="if(value==='12.1')value=''" onblur="if(value==='')value='12.1'">
                 </p>
                 <br/>
             </div>
@@ -245,7 +246,7 @@
             </div>
         </div>
         
-		<script src="https://hammerjs.github.io/dist/hammer.js"></script>        
+		    
         
         
         <script type="text/javascript">
@@ -258,17 +259,17 @@
             
             // *** Change these conditions to run different tests
       //      var repetitions = 20;
-            var heights = [0.2, 0.4, 0.6, 0.8,1];//target hight cm
-            var amplitudes = [3, 6, 9];//target distance  cm
+            const heights = [0.2, 0.4, 0.6, 0.8,1];//target hight cm
+            const amplitudes = [3, 6, 9];//target distance  cm
             const ABANDON_NUM = 1;// For each group of width*distance experiments, the first ABANDON_NUM of experimental data is invalid and will be abandoned. when 0 means all data is valid
-            var repetitions = 1+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
+            const repetitions = 10+ABANDON_NUM;//repeat times for each group; set to 10+ABANDON_NUM when do the real Experiments;
             
            // var heights = [10, 20, 40,80,160];//px
            // var amplitudes = [40, 80, 160];//px
             // ***
             
-            var flash_delay = 130; //msec
-            
+            const flash_delay = 130; //msec
+            const pinchWaitTime = 1000;//ms
            
             //Ongoing tests
             var trials;
@@ -276,7 +277,7 @@
             var cur_trial;
             var cur_repetition = 0;
             var cur_start_time = 0;
-            var cur_count_start_time =-10 ; 
+            var cur_count_start_time = 0 ; 
            
             var trial_flash_queued = false;
             var total_repetitions = -1;//practice one times
@@ -299,7 +300,7 @@
 //var for pinch
 			
 						
-			var pinchWaitTime = 500;//ms
+			
 			var countDownStartAndOverlay = false; 
 			var countDownTimer;
             //debug log    	
@@ -309,7 +310,7 @@
             //var exp_first_time = $.now();
             //var exp_time;
             var cursorOnTarget = 0;
-            var stopLog = false;//the last target was hitted .test finish
+            var stopLog = true;//
             var pointNum = 0;
             var isHit = 0;
             var writeLogInt;//store handle for writeLog function 
@@ -327,14 +328,15 @@
             $("#width").val(localStorage.getItem("physical_width"));
             $("#height").val(localStorage.getItem("physical_height"));
             $("#device").val(localStorage.getItem("device_type"));
+            $("#name").val(localStorage.getItem("tester_name"));
             
             //click function for result-overlay
             $('#save-file').click(function(){
                    // var time = $.now();
                     var d = new Date();
-                    $('#results-table').tableExport({fileName:$("#name").val()+'-'+d.toLocaleString(),type:'csv'});
+                    $('#results-table').tableExport({fileName:$("#name").val()+"-"+$("#type").val()+'-'+d.toLocaleString('chinese',{hour12:false}),type:'csv'});
                     
-                    bugout.downloadLog($("#name").val()+'-'+d.toLocaleString());
+                    bugout.downloadLog($("#name").val()+"-"+$("#type").val()+'-'+d.toLocaleString('chinese',{hour12:false}));
                     exitFullscreen();
                                   
                     }) ;
@@ -344,38 +346,55 @@
                 });
             //do test again
             $('#restart').click(function(){
-                
-                
-                cur_repetition = 0;
-                cur_start_time = 0;
-                cur_count_start_time = -1; 
+               
+              
 
-                trial_flash_queued = false;
-                total_repetitions = -1;//practice one times
-                total_error_count = 0;
-                total_start_time = 0;
-                first_ribbon_is_active = false;
-                isFirstTest = false;
-                stopLog = false;
-                results = new Object;//clear results;
-                      
-          
-          
+            trials = NaN;
+            sorted_trial_names = NaN;
+            cur_trial = NaN;
+            cur_repetition = 0;
+            cur_start_time = 0;
+            cur_count_start_time = 0 ; 
+           
+            trial_flash_queued = false;
+            total_repetitions = -1;//practice one times
+            total_error_count = 0;
+            total_start_time = 0;
+            first_ribbon_is_active = false;
+            results = new Object;
+            isFirstTest = false;
+           
             
-                countDownStartAndOverlay = false;
-
-                //for log
-                //exp_num = 0;//keep increaseing for multiple test
-                cursorOnTarget = 0;
-                isHit = 0;
-                //stopLog = false;
-                pointNum = 0;
-                //touch point location
-                p1x = 0;
-                p1y = 0;
-                p2x = 0;
-                p2y = 0;
-                centerY = 0;
+            //Device characteristics
+            physical_width = NaN;
+            physical_height = NaN;
+            resolution_width = NaN;
+            resolution_height = NaN;
+            window_height = NaN;
+            window_width = NaN;
+            scalefactor_x = NaN;
+            scalefactor_y = NaN;
+//var for pinch
+			
+						
+			
+			countDownStartAndOverlay = false; 
+			countDownTimer = NaN;
+            //debug log    	
+            //bugout = new debugout();
+            //exp_num = 0;
+        
+            cursorOnTarget = 0;
+            stopLog = true;//the last target was hitted .test finish
+            pointNum = 0;
+            isHit = 0;
+            writeLogInt = NaN;//store handle for writeLog function 
+            //touch point location
+            var p1x = 0;
+            var p1y = 0;
+            var p2x = 0;
+            var p2y = 0;
+            var centerY = 0;//record touch point center
 
                 $("#cursor").css("display","none");
                 $("#start_button").click(submitSetup);
@@ -524,7 +543,8 @@
                 //store the input parameters locally  as cookies           
                 localStorage.setItem("physical_width", $('#width').val());     
                 localStorage.setItem("physical_height", $('#height').val()); 
-                localStorage.setItem("device_type", $('#device').val());          
+                localStorage.setItem("device_type", $('#device').val());   
+                localStorage.setItem("tester_name", $('#name').val());         
                 
                 //add debug info
                 $("#debug").append($("<li></li>").text("devicePixelRatio: "+scalefactor_y));
@@ -682,24 +702,25 @@
                         
                         
                         //make sure input is pinch
-                        if (ev.pointers.length < 2) 
-                        {   if(ev.pointers.length==1)
-                            {
-                                var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
-                                var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
-                                if(d1<d2)
-                                {
-                                    p1x = ev.pointers[0].x;
-                                    p1y = ev.pointers[0].y;
-                                }
-                                else
-                                {
-                                    p2x = ev.pointers[0].x;
-                                    p2y = ev.pointers[0].y;
-                                }
-                            }
-                            return;
+                        
+                    if(ev.pointers.length==1)
+                    {
+                        var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
+                        var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
+                        if(d1<d2)
+                        {
+                            p1x = ev.pointers[0].x;
+                            p1y = ev.pointers[0].y;
                         }
+                        else
+                        {
+                            p2x = ev.pointers[0].x;
+                            p2y = ev.pointers[0].y;
+                        } 
+                        return;
+                    }
+                           
+                        if (ev.pointers.length != 2)  return;
                         $('#cursor').css('top',ev.center.y +'px');
                          //for log, record location for touch point
                         p1x = ev.pointers[0].x;
@@ -998,7 +1019,7 @@
                             
                             
                         }
-                        else  cur_count_start_time = -2;
+                        else  cur_count_start_time = 0;
                         
 
                         }, pinchWaitTime);
@@ -1012,7 +1033,7 @@
                     
                     if(countDownStartAndOverlay&&countDownTimer)clearTimeout(countDownTimer);
                     countDownStartAndOverlay = false;
-                    cur_count_start_time = -3;
+                    cur_count_start_time = 0;
                 }
                 //$("#debug-overlay").text("countDownStartAndOverlay"+countDownStartAndOverlay); 
             } 
@@ -1123,9 +1144,9 @@
             
             function presentResults() {
 
-                if($('#type option:selected').val()==='tap')$("#test-container").unbind();
                 stopLog = true;
                 clearInterval(writeLogInt);
+                if($('#type option:selected').val()==='tap')$("#test-container").unbind();
                 
                 
 
