@@ -26,7 +26,7 @@
 							pointer-events:none;
 							display:inline-block;
 							margin:0px;
-                            border-top: 1px solid #a200ff;
+                            border-top: 1px solid #ff0000;
                             
 							
 							
@@ -145,16 +145,16 @@
                 top: 0px;
                 height: 50px;
                 width: 100%;
-                background-color: #175837;
-                opacity:0.2
+                background-color: #999999;
+                
             }
             .ribbon.target {
-                background-color: #ff0000;
+                background-color:  blue;
                 opacity:1
             }
             .ribbon.target.hover {
-                background-color: #08f592;
-                opacity:1
+                background-color: #1900ff;
+                opacity:0.5
             }
             .smaller {
                 font-size: smaller;
@@ -268,7 +268,7 @@
            // var amplitudes = [40, 80, 160];//px
             // ***
             
-            const flash_delay = 150; //msec
+            const flash_delay = 100; //msec
             const pinchWaitTime = 500;//ms
            
             //Ongoing tests
@@ -335,9 +335,10 @@
             $('#save-file').click(function(){
                    // var time = $.now();
                     var d = new Date();
-                    $('#results-table').tableExport({fileName:$("#name").val()+"-"+$("#type").val()+'-'+d.toLocaleString('chinese',{hour12:false}),type:'csv'});
+                    $('#results-table').tableExport({fileName:d.toLocaleString('chinese',{hour12:false})+'-'+$("#name").val()+"-"+$("#type").val(),type:'csv'});
                     
-                    bugout.downloadLog($("#name").val()+"-"+$("#type").val()+'-'+d.toLocaleString('chinese',{hour12:false}));
+                    bugout.downloadLog(d.toLocaleString('chinese',{hour12:false})+'-'+$("#name").val()+"-"+$("#type").val());
+                    bugout = NaN;//clear log
                     exitFullscreen();
                                   
                     }) ;
@@ -383,7 +384,7 @@
 			countDownStartAndOverlay = false; 
 			countDownTimer = NaN;
             //debug log    	
-            //bugout = new debugout();
+            bugout = new debugout();
             //exp_num = 0;
         
             cursorOnTarget = 0;
@@ -826,8 +827,8 @@
                     }
                     
                     //Now that we've queued something, toggle the interstitial screen
-                    $(".ribbon").css("backgroundColor","");
-                    trial_flash_queued = false;
+                    // $(".ribbon").css("backgroundColor","");
+                    // trial_flash_queued = false;
                     
                    //if($('#type option:selected').val()==='tap') $("#test-container").unbind();
                    //$("#interstitial-overlay").show();   
@@ -1091,13 +1092,13 @@
                 }
                
 
-               // flash to show hit and queue the next one
-                // $(".target").css("backgroundColor","#0000ff");
-                // trial_flash_queued = true;
-                // setTimeout(function() {
-                //     $(".ribbon").css("backgroundColor","");
-                //     trial_flash_queued = false;
-                // }, flash_delay);
+               //flash to show hit and queue the next one
+                $(".target").css("backgroundColor","#33cc33");
+                trial_flash_queued = true;
+                setTimeout(function() {
+                    $(".ribbon").css("backgroundColor","");
+                    trial_flash_queued = false;
+                }, flash_delay);
                 
                 queueNextTrial();
                 
@@ -1116,12 +1117,12 @@
                 
                 
                // flash to show miss and queue the next one
-                // $(".target").css("backgroundColor","#cc3333");
-                // trial_flash_queued = true;
-                // setTimeout(function() {
-                //     $(".ribbon").css("backgroundColor","");
-                //     trial_flash_queued = false;
-                // }, flash_delay);
+                $(".target").css("backgroundColor","#cc3333");
+                trial_flash_queued = true;
+                setTimeout(function() {
+                    $(".ribbon").css("backgroundColor","");
+                    trial_flash_queued = false;
+                }, flash_delay);
 
                 
                 queueNextTrial();
