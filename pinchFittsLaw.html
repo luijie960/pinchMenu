@@ -145,11 +145,11 @@
                 top: 0px;
                 height: 50px;
                 width: 100%;
-                background-color: #1c7045;
-                opacity:0.5
+                background-color: #175837;
+                opacity:0.2
             }
             .ribbon.target {
-                background-color: #f10a0a;
+                background-color: #ff0000;
                 opacity:1
             }
             .ribbon.target.hover {
@@ -268,8 +268,8 @@
            // var amplitudes = [40, 80, 160];//px
             // ***
             
-            const flash_delay = 130; //msec
-            const pinchWaitTime = 1000;//ms
+            const flash_delay = 150; //msec
+            const pinchWaitTime = 500;//ms
            
             //Ongoing tests
             var trials;
@@ -278,7 +278,8 @@
             var cur_repetition = 0;
             var cur_start_time = 0;
             var cur_count_start_time = 0 ; 
-           
+            var cur_end_time = 0;
+
             var trial_flash_queued = false;
             var total_repetitions = -1;//practice one times
             var total_error_count = 0;
@@ -355,7 +356,8 @@
             cur_repetition = 0;
             cur_start_time = 0;
             cur_count_start_time = 0 ; 
-           
+            cur_end_time= 0;
+
             trial_flash_queued = false;
             total_repetitions = -1;//practice one times
             total_error_count = 0;
@@ -683,7 +685,9 @@
                 bugout.log("No testNo width distance cur_repetition onTarget hit pointNum name type x1 y1 x2 y2 cursorY centerY time cur_start_time");
 				var guestureType= $('#type option:selected').val();
 				if(guestureType==='tap'){
-                    $("#test-container").unbind().bind('vmouseup',trialClick);
+                    $("#test-container").unbind();
+                    $("#test-container").bind('vmouseup',trialClick);
+                    $("#test-container").bind('vmousedown',clickDown);
                     mc.get('pinch').set({ enable:false});
                     
                      }
@@ -848,7 +852,7 @@
                 }
                 
                
-				if($('#type option:selected').val()==='tap'){$("#test-container").unbind().bind('vmouseup',trialClick);}
+				//if($('#type option:selected').val()==='tap'){$("#test-container").unbind().bind('vmouseup',trialClick);}
                 presentTrial(cur_trial);
             }
             
@@ -894,12 +898,17 @@
 				
                 
             }
+            function clickDown(e)
+            {
+                cur_count_start_time = $.now();
+            }
             
             function trialClick(e) {
                // e.stopPropagation();
 
                 
-                
+                cur_end_time = $.now();//must before writelog
+
                 var x;
                 var y;
                 $("#debug-overlay").text("event:"+e.type); 
@@ -1007,6 +1016,7 @@
                         {  
                            
                             //fo log
+                            cur_end_time = $.now();//must before writelog()
                             isHit = 1;
                             writeLog(); //writlog must before trialHit
                             isHit = 0;
@@ -1065,7 +1075,7 @@
                 cur_trial.width
 
                     //exp_distance = Math.sqrt(Math.pow((ev.pointers[0].clientX - ev.pointers[1].clientX),2)+Math.pow((ev.pointers[0].clientY - ev.pointers[1].clientY),2));
-                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.height+" "+cur_trial.amplitude+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+y+" "+centerY+" "+String($.now())+" "+cur_start_time;
+                    var line =String(++exp_num)+" "+String(total_repetitions)+" "+cur_trial.height+" "+cur_trial.amplitude+" "+cur_repetition+" "+cursorOnTarget+" "+isHit+" "+pointNum+" "+$('#name').val()+" "+$('#type').val()+" "+String(p1x)+" "+String(p1y)+" "+String(p2x)+" "+String(p2y)+" "+y+" "+centerY+" "+String(cur_end_time)+" "+cur_start_time;
                     //export finger location message
                     //bugout.log("number x1 y1 x2 y2 time distance");
                     bugout.log(line);
@@ -1081,8 +1091,8 @@
                 }
                
 
-                //flash to show hit and queue the next one
-                // $(".target").css("backgroundColor","#33cc33");
+               // flash to show hit and queue the next one
+                // $(".target").css("backgroundColor","#0000ff");
                 // trial_flash_queued = true;
                 // setTimeout(function() {
                 //     $(".ribbon").css("backgroundColor","");
@@ -1105,7 +1115,7 @@
                 }
                 
                 
-                //flash to show miss and queue the next one
+               // flash to show miss and queue the next one
                 // $(".target").css("backgroundColor","#cc3333");
                 // trial_flash_queued = true;
                 // setTimeout(function() {
@@ -1118,7 +1128,7 @@
             }
             
             function recordResults(was_hit) {
-                var end_time = $.now();
+                var end_time = cur_end_time;
                 var diff = end_time - cur_start_time;
                 
                 var result = new Object;
@@ -1146,7 +1156,10 @@
 
                 stopLog = true;
                 clearInterval(writeLogInt);
-                if($('#type option:selected').val()==='tap')$("#test-container").unbind();
+                if($('#type option:selected').val()==='tap'){
+                    $("#test-container").unbind();
+
+                }
                 
                 
 
