@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scaleable=no">
         
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
-        <link rel="stylesheet" href="style.css" media="screen" type="text/css" />
+        <link rel="stylesheet" href="http://raw.githack.com/luijie960/pinchMenu/master/style.css" />
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="http://hammerjs.github.io/dist/hammer.min.js"></script> 
@@ -16,7 +16,7 @@
         <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
         <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
         <script src="http://raw.githack.com/carhartl/jquery-cookie/master/src/jquery.cookie.js"></script>
-        
+
         <style>
 		
 		.cursor {	   
@@ -90,7 +90,6 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
-                z-index: 9999
             }
             
             #test-container {
@@ -175,10 +174,9 @@
             <p>
                 Guesture  Type:
                 <select id="type">
-                    
+                    <option value="tap">tap</option>
                     <option value="pinchIn">pinchIn</option>
                     <option value="pinchOut">pinchOut</option>
-                    <option value="tap">tap</option>
                     
                 </select>
                 <br/>
@@ -241,16 +239,14 @@
         <div id="test-container" class="fullscreen" >
             <div id="ribbon-1" class="ribbon" style="top:50px;"></div>
             <div id="ribbon-2" class="ribbon target" style="top:300px;"></div>
-
-
             <div id="trial-overlay">Practice</div>
 			<div id="debug-overlay"> debug</div>
             <div id="debug"><ol id="debugitems"><li>debug</li></ol></div>
             <div id="interstitial-overlay" class="fullscreen">
                 <div id="interstitial-box">Starting next test in a few seconds...</div>
             </div>
-            <div style = "overflow: scroll">
-            
+            <div >
+             
                 <ul id="accordion" class="accordion" >
                     <li>
                         <div class="link folder"><i class="fa fa-paint-brush"></i>1<i class="fa fa-chevron-down"></i></div>
@@ -630,87 +626,6 @@
                             </ul>
                         </div>
                     </li>
-                    <li>
-                        <div class="link folder"><i class="fa fa-globe"></i>15<i class="fa fa-chevron-down"></i></div>
-                        <div class="subDiv" >
-                            <ul class="submenu">
-                                <li><a href="#">1</a></li>
-                                <li><a href="#">2</a></li>
-                                <li><a href="#">3</a></li>
-                                <li><a href="#">4</a></li>
-                                <li><a href="#">5</a></li>
-                                <li><a href="#">6</a></li>
-                                <li><a href="#">7</a></li>
-                                <li><a href="#">8</a></li>
-                                <li><a href="#">9</a></li>
-                                <li><a href="#">10</a></li>
-                                <li><a href="#">11</a></li>
-                                <li><a href="#">12</a></li>
-                                <li><a href="#">13</a></li>
-                                <li><a href="#">14</a></li>
-                                <li><a href="#">15</a></li>
-                                <li><a href="#">16</a></li>
-                                <li><a href="#">17</a></li>
-                                <li><a href="#">18</a></li>
-                                <li><a href="#">19</a></li>
-                                <li><a href="#">20</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="link folder"><i class="fa fa-globe"></i>16<i class="fa fa-chevron-down"></i></div>
-                        <div class="subDiv" >
-                            <ul class="submenu">
-                                <li><a href="#">1</a></li>
-                                <li><a href="#">2</a></li>
-                                <li><a href="#">3</a></li>
-                                <li><a href="#">4</a></li>
-                                <li><a href="#">5</a></li>
-                                <li><a href="#">6</a></li>
-                                <li><a href="#">7</a></li>
-                                <li><a href="#">8</a></li>
-                                <li><a href="#">9</a></li>
-                                <li><a href="#">10</a></li>
-                                <li><a href="#">11</a></li>
-                                <li><a href="#">12</a></li>
-                                <li><a href="#">13</a></li>
-                                <li><a href="#">14</a></li>
-                                <li><a href="#">15</a></li>
-                                <li><a href="#">16</a></li>
-                                <li><a href="#">17</a></li>
-                                <li><a href="#">18</a></li>
-                                <li><a href="#">19</a></li>
-                                <li><a href="#">20</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="link folder"><i class="fa fa-globe"></i>17<i class="fa fa-chevron-down"></i></div>
-                        <div class="subDiv" >
-                            <ul class="submenu">
-                                <li><a href="#">1</a></li>
-                                <li><a href="#">2</a></li>
-                                <li><a href="#">3</a></li>
-                                <li><a href="#">4</a></li>
-                                <li><a href="#">5</a></li>
-                                <li><a href="#">6</a></li>
-                                <li><a href="#">7</a></li>
-                                <li><a href="#">8</a></li>
-                                <li><a href="#">9</a></li>
-                                <li><a href="#">10</a></li>
-                                <li><a href="#">11</a></li>
-                                <li><a href="#">12</a></li>
-                                <li><a href="#">13</a></li>
-                                <li><a href="#">14</a></li>
-                                <li><a href="#">15</a></li>
-                                <li><a href="#">16</a></li>
-                                <li><a href="#">17</a></li>
-                                <li><a href="#">18</a></li>
-                                <li><a href="#">19</a></li>
-                                <li><a href="#">20</a></li>
-                            </ul>
-                        </div>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -790,11 +705,7 @@
             var p2x = 0;
             var p2y = 0;
             var centerY = 0;//record touch point center
-//var for accordion menu
-            var lastHover;
-            var currentFolder;
-            var lastFolder;
-            var moveStartPosY;
+
 
             var myElement = document.getElementById("test-container");
 			var mc = new Hammer(myElement);
@@ -884,22 +795,7 @@
                 exitFullscreen();
             });
 		
-            function setFolderHeight(scale){
-                //根据pinch修改菜单的高度
-                //var subD =  document.getElementById('subDiv');
-                var folderHeight = scale*Math.round(resolution_height/10);
-                var heightInc = folderHeight - currentFolder.height();
-                if ( scale>2&&heightInc > 0) {
-                    currentFolder.css('height', folderHeight + 'px');
-                   
 
-                } else if (folderHeight < currentFolder.height() * 0.7) {
-                    currentFolder.css('height', 0 + 'px');
-                    //一级菜单回到一当前光标为中心的位置
-                    // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                }
-                            
-            }
 			// Find the right method, call on correct element
 			function launchIntoFullscreen() {
 				//var element = document.getElementById('test-container');
@@ -1190,80 +1086,61 @@
 					 mc.on("hammer.input",function(ev){
                         $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
                         //for log    
-                        pointNum = ev.pointers.length;
+                        pointNum = ev.pointers.length;//touch point number
                         centerY =   ev.center.y;  
                         
                         
                         //make sure input is pinch
                         
-                        if(ev.pointers.length==1)
+                    if(ev.pointers.length==1)//just from 2 touch point to 1 touch point,find out which point lost
+                    {
+                        var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
+                        var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
+                        if(d1<d2)
                         {
-                            var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
-                            var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
-                            if(d1<d2)
-                            {
-                                p1x = ev.pointers[0].x;
-                                p1y = ev.pointers[0].y;
-                            }
-                            else
-                            {
-                                p2x = ev.pointers[0].x;
-                                p2y = ev.pointers[0].y;
-                            } 
-                            return;
+                            p1x = ev.pointers[0].x;
+                            p1y = ev.pointers[0].y;
                         }
+                        else
+                        {
+                            p2x = ev.pointers[0].x;
+                            p2y = ev.pointers[0].y;
+                        } 
+                        return;
+                    }
                            
                         if (ev.pointers.length != 2)  return;
+                        $('#cursor').css('top',ev.center.y +'px');//move cursor to center of touch points
                          //for log, record location for touch point
                         p1x = ev.pointers[0].x;
                         p1y = ev.pointers[0].y;
                         p2x = ev.pointers[1].x;
                         p2y = ev.pointers[1].y;
-                        //move cursor
-                         $('#cursor').css('top',ev.center.y +'px');
-                        //获取光标处的元素
-                        var cursorElem = $(document.elementFromPoint(ev.center.x, ev.center.y));
 
-
-                        //hover效果呈现
-                            if(cursorElem != lastHover)
-                            {
-                                if (lastHover) lastHover.removeClass('hover');
-                                
-                                if (!cursorElem.hasClass('hover')) {
-                                    cursorElem.addClass('hover');
-                                    
-                                }
-                                lastHover = cursorElem;
-                                // if(lastHover)lastHover.css("backgroundColor","#ffffff ");
-                                // if(cursorElem)cursorElem.css("backgroundColor","#33cc33");
-                                // lastHover = cursorElem;
-                            }
-
-                               //设置父菜单节点
-                            if (cursorElem.hasClass('folder')) //当前元素为folder
-                                currentFolder = cursorElem.next('.subDiv');
-                            else if (cursorElem.hasClass('subDiv'))
-                                currentFolder = cursorElem; //当前元素为subDiv
-                            else if (cursorElem.parents('.subDiv'))
-                                currentFolder = cursorElem.parents('.subDiv').first(); //当前元素所在的folder
-
-                            //expand or collapse folder by pinch distance
-                            //ar dis = (ev.pointers[0].x-ev.pointers[1].x)*(ev.pointers[0].x-ev.pointers[1].x)+(ev.pointers[0].y-ev.pointers[1].y)*(ev.pointers[0].y-ev.pointers[1].y);
-                            setFolderHeight(ev.scale);
-                         
-                            
-                            //if a folder opened the upper menu move with the cursor
-                             
+                         var y = ev.center.y;
+                        //find out where active bar is located
+                        var minY1 = parseInt($("#ribbon-1").css('top'));
+                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($("#ribbon-1").css('height'));
+                        var minY2 = parseInt($("#ribbon-2").css('top'));
+                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($("#ribbon-2").css('height'));
+                        
+                        if(y >= minY1 && y <= maxY1)
+                             $("#ribbon-1").addClass('hover');
+                        else 
+                            if($("#ribbon-1").hasClass('hover')) $("#ribbon-1").removeClass('hover');
+                        if(y >= minY2 && y <= maxY2)
+                             $("#ribbon-2").addClass('hover');
                        
-                     
-
-                       
+                        else 
+                            if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
                         
                                       
                                  
 						 });
-				
+					//hide cursor
+					// mc.on("pinchend",function(ev){
+					// 	$('#cursor').css('display','none');
+					// });
 
 					mc.on("hammer.input",trialPinch);
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
