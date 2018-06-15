@@ -1254,27 +1254,6 @@
                         var node = $.ui.fancytree.getNode(cursorElem);
                         if(node)node.setActive();
                         
-                            //根据pinch修改菜单的高度
-                        if(node.folder) 
-                        {
-
-                            var folderHeight = ev.scale * 60;
-                            //var heightInc = folderHeight - node.height();
-                            if (Math.abs(p1y-p2y) > 40 ) {
-                                //node.setExpanded();
-                                //treeIterm.css('height', folderHeight + 'px');
-                                node.setExpanded();
-                                //accordion.css('top',accordion.position().top-heightInc/2+'px') ;
-
-                            } else if (Math.abs(p1y-p2y) > 40) {
-                                node.setExpanded(false);
-                                //treeIterm.css('height', 40 + 'px');
-                                //一级菜单回到一当前光标为中心的位置
-                                // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                            }
-
-
-                        }
                          
                         $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y+";"+treeItermID); 
                             
