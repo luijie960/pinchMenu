@@ -8,14 +8,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scaleable=no">
         
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+<<<<<<< HEAD
         <link rel="stylesheet" href="http://raw.githack.com/luijie960/pinchMenu/master/style.css" />
+=======
+        
+>>>>>>> a17b8b07aa28049531a84d0be7416b1edf35a370
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="http://hammerjs.github.io/dist/hammer.min.js"></script> 
 	    <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/libs/FileSaver/FileSaver.min.js"></script>
         <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
-        <script src="http://raw.githack.com/luijie960/pinchMenu/master/debugout.js"></script>
+        <script src="http://raw.githack.com/luijie960/pinchMenu/master/js/debugout.js"></script>
         <script src="http://raw.githack.com/carhartl/jquery-cookie/master/src/jquery.cookie.js"></script>
+<<<<<<< HEAD
+=======
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	    <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+	    <link href="http://raw.githack.com/mar10/fancytree/master/src/skin-win8/ui.fancytree.css" rel="stylesheet">
+	    <script src="http://raw.githack.com/mar10/fancytree/master/src/jquery.fancytree.js"></script>
+>>>>>>> a17b8b07aa28049531a84d0be7416b1edf35a370
 
         <style>
 		
@@ -163,7 +175,71 @@
            
             
         </style>
-        
+        <style type="text/css">
+
+            ul.fancytree-container {
+                border: 1px solid gray;
+                width: 100%;
+                overflow: auto;
+                /* The expand animations result in ugly focus outline artefacts, so hide those. */
+                outline: 0;
+            }
+            /* Display top level nodes as accordion header. */
+            ul.fancytree-container >li >.fancytree-node span.fancytree-title {
+                box-sizing: border-box;
+                width: 100%;
+                padding: 4px;
+                margin: 0;
+                background-color: #ddd;
+                border: 1px solid #bbb;
+                font-weight: 550;
+                height: 40px;
+            }
+            /* Hide  expanders for top-level nodes */
+            ul.fancytree-container >li >.fancytree-node .fancytree-expander {
+                display: none;
+            }
+            /* Don't indent level-2 nodes */
+            ul.fancytree-container >li >ul {
+                padding-left: 0;
+                height :100px;
+                overflow: auto;
+            }
+            
+            </style>
+            
+            <!-- Add code to initialize the tree when the document is loaded: -->
+            <script type="text/javascript">
+                $(function(){
+                    // Attach the fancytree widget to an existing <div id="tree"> element
+                    // and pass the tree options as an argument to the fancytree() function:
+                    $("#tree").fancytree({
+                        autoCollapse: true,
+                        
+                        clickFolderMode: 3,
+                        icon: function(event, data) {
+                            return !data.node.isTopLevel();
+                        },
+                       
+                        
+                        keydown: function(event, data){
+                            switch( $.ui.fancytree.eventToString(data.originalEvent) ) {
+                            case "return":
+                            case "space":
+                                data.node.toggleExpanded();
+                                //$("#tree").fancytree("getTree").activateKey("ui-id-1");
+                                
+                               // alert("space");
+                                break;
+                            }
+                        }
+                    });
+                    
+                     //$("#tree").fancytree("getTree").activateKey("ui-id-1");
+                    // $("#tree").fancytree("getTree").getNodeByKey("10_1_1").setActive();
+                });
+                
+            </script>
     </head>
     <body >
         <div id="cursor" class="cursor"></div>
@@ -245,6 +321,7 @@
             <div id="interstitial-overlay" class="fullscreen">
                 <div id="interstitial-box">Starting next test in a few seconds...</div>
             </div>
+<<<<<<< HEAD
             <div >
              
                 <ul id="accordion" class="accordion" >
@@ -628,6 +705,56 @@
                     </li>
                 </ul>
             </div>
+=======
+            <div id="tree" style = "overflow: scroll">
+            
+                <ul>
+                    <li id="1" class="folder expanded">Standard nodes, modified by extra CSS rules
+                      <ul>
+                        <li id="node_4.1">Sub-item 4.1
+                        <li id="node_4.2">Sub-item 4.2
+                        <li id="node_4.3">Sub-item 4.3
+                        <li id="node_4.4">Sub-item 4.4
+                        <li id="node_4.5">Sub-item 4.5
+                        <li id="node_4.6">Sub-item 4.6
+                        <li id="node_4.7">Sub-item 4.7
+                        <li id="node_4.8">Sub-item 4.8
+                        <li id="node_4.9">Sub-item 4.9
+                        <li id="node_4.10">Sub-item 4.10
+                        <li id="node_4.11">Sub-item 4.11
+                        <li id="node_4.12">Sub-item 4.12
+                        <li id="node_4.13">Sub-item 4.13
+                        <li id="node_4.14">Sub-item 4.14
+                        <li id="node_4.15">Sub-item 4.15
+                        <li id="node_4.16">Sub-item 4.16    
+                      </ul>
+              
+                    <li id="2" class="folder expanded">Override CSS style per node
+                      <ul>
+                        <li class="custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                        <li class="folder custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                      </ul>
+              
+                    <li id="3" class="folder expanded">Use 'data-NAME' attributes to define additional data
+                      <ul>
+                        <li data-icon="customDoc1.gif">Node with standard CSS, but custom icon
+                        <li class="folder" data-icon="folder_docs.gif">Folder with standard CSS but custom icon
+                        <li data-icon="ui-icon ui-icon-heart">'icon' is directly added to the image &lt;span>, so jQuery stock icons may be used
+                      </ul>
+              
+                    <li id="4" class="folder expanded">Use 'data-json' attribute to define additional data
+                      <ul>
+                        <li data-json='{"icon": "customDoc1.gif"}'>Node with standard CSS, but custom 'data-icon'
+                      </ul>
+              
+                    <li id="5" class="folder expanded">Use render callback
+                      <ul>
+                        <li id="renderNode1" data-cstrender="true">Node hat will be handled by 'render' calback
+                      </ul>
+              
+                  </ul>
+                  </div>
+>>>>>>> a17b8b07aa28049531a84d0be7416b1edf35a370
         </div>
         
 		    
@@ -837,13 +964,8 @@
             
             function isFull() {
                 var fullscreenElement =
-                    document.fullscreenEnabled
-                    || document.mozFullscreenElement
-                    || document.webkitFullscreenElement;
-                var fullscreenEnabled =
-                    document.fullscreenEnabled
-                    || document.mozFullscreenEnabled
-                    || document.webkitFullscreenEnabled;
+                    document.fullscreenEnabled|| document.mozFullscreenElement|| document.webkitFullscreenElement;
+                var fullscreenEnabled =document.fullscreenEnabled|| document.mozFullscreenEnabled|| document.webkitFullscreenEnabled;
                 if (fullscreenElement == null)
                 {
                     return false;
@@ -1084,7 +1206,7 @@
                      mc.get('pinch').set({ enable: true });
 					//move cursor
 					 mc.on("hammer.input",function(ev){
-                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
+                
                         //for log    
                         pointNum = ev.pointers.length;//touch point number
                         centerY =   ev.center.y;  
@@ -1116,6 +1238,51 @@
                         p1y = ev.pointers[0].y;
                         p2x = ev.pointers[1].x;
                         p2y = ev.pointers[1].y;
+<<<<<<< HEAD
+=======
+                        //move cursor
+                         $('#cursor').css('top',ev.center.y +'px');
+                        //获取光标处的元素
+                        
+                        var cursorElem = $(document.elementFromPoint(ev.center.x, ev.center.y));
+                        var treeIterm = cursorElem.parents('li').first();
+                        var treeItermID = treeIterm.attr('id');
+                      
+
+                        //set the treeIterm to  focus
+                       // $("#tree").fancytree("getTree").getNodeByKey("node_4.2").setFocus();
+                        var node = $.ui.fancytree.getNode(cursorElem);
+                        if(node)node.setActive();
+                        
+                            //根据pinch修改菜单的高度
+                        if(node.folder) 
+                        {
+
+                            var folderHeight = ev.scale * 60;
+                            //var heightInc = folderHeight - node.height();
+                            if (Math.abs(p1y-p2y) > 40 ) {
+                                //node.setExpanded();
+                                //treeIterm.css('height', folderHeight + 'px');
+                                node.setExpanded();
+                                //accordion.css('top',accordion.position().top-heightInc/2+'px') ;
+
+                            } else if (Math.abs(p1y-p2y) > 40) {
+                                node.setExpanded(false);
+                                //treeIterm.css('height', 40 + 'px');
+                                //一级菜单回到一当前光标为中心的位置
+                                // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
+                            }
+
+
+                        }
+                         
+                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y+";"+treeItermID); 
+                            
+                           
+                             
+                       
+                     
+>>>>>>> a17b8b07aa28049531a84d0be7416b1edf35a370
 
                          var y = ev.center.y;
                         //find out where active bar is located
@@ -1157,7 +1324,10 @@
 				
                 
             }
-            
+            function getElsAt(top, left){
+                //return $("body").find("*").filter(function(){return $(this).offset().top == top && $(this).offset().left == left})
+                return $("#tree").find("*").filter(function(){return $(this).offset().top <= top &&  ($(this).offset().top+$(this).height)>=top})
+                }
             function queueNextTrial() {
                 
                 total_repetitions++;
@@ -1438,7 +1608,7 @@
 			}
 
             function writeLog()
-            {
+            {return;
                 if(stopLog)return;
                var minY = parseInt($(".target").css('top'));
                var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
