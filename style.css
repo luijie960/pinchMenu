@@ -47,6 +47,7 @@ h1 a {
 	position:relative;
 	top:0px;
 	overflow: auto;
+	z-index: 200;
 	
  }
 
@@ -146,10 +147,10 @@ h1 a {
     }
 
 .folder {
-  z-index: 2;
+
 }
 .subDiv{
   overflow: hidden;
   height: 0px;
-  z-index: 1;
+  
 }

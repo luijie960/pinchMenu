@@ -24,7 +24,7 @@
 							height:1px;
 							top:0px; 
 							position:relative;
-							z-index:100;
+							z-index:999;
 							pointer-events:none;
 							display:inline-block;
 							margin:0px;
@@ -80,6 +80,7 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
+                z-index: 900;
             }
 			 #debug-overlay {
                 position: fixed;
@@ -91,6 +92,7 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
+                z-index: 900;
             }
             
             #test-container {
@@ -246,12 +248,12 @@
             <div id="interstitial-overlay" class="fullscreen">
                 <div id="interstitial-box">Starting next test in a few seconds...</div>
             </div>
-            <div id="myElement">good</div>
+            
             <ul id="accordion" class="accordion" >
                 <li>
                     <div class="link folder"><i class="fa fa-paint-brush"></i>1<i class="fa fa-chevron-down"></i></div>
                     <div id="subDiv" class="subDiv" >
-                        <ul  class="submenu" style="z-index:60">
+                        <ul  class="submenu" >
                             <li><a href="#">1</a></li>
                             <li><a href="#">2</a></li>
                             <li><a href="#">3</a></li>
@@ -359,7 +361,7 @@
                 <li>
                     <div class="link folder"><i class="fa fa-paint-brush"></i>5<i class="fa fa-chevron-down"></i></div>
                     <div id="subDiv" class="subDiv" >
-                        <ul  class="submenu" style="z-index:60">
+                        <ul  class="submenu" >
                             <li><a href="#">1</a></li>
                             <li><a href="#">2</a></li>
                             <li><a href="#">3</a></li>
@@ -705,7 +707,7 @@
             var p2y = 0;
             var centerY = 0;//record touch point center
 //accordion menu
-            var myElement = document.getElementById('myElement');
+            
             //var accordionElm = document.getElementById('accordion');
             var accordion = $('#accordion');
            //var mc = new Hammer(accordionElm);
@@ -1149,7 +1151,7 @@
 
 
                         //hover效果呈现
-                        if (lastHover && lastHover.hasClass('hover')) lastHover.removeClass('hover');
+                        if (lastHover ) lastHover.removeClass('hover');
                         if (!cursorElem.hasClass('hover')) {
                             cursorElem.addClass('hover');
                             lastHover = cursorElem;
@@ -1182,8 +1184,19 @@
                             } else if (folderHeight < currentFolder.height() * 0.7) {
                                 currentFolder.css('height', 0 + 'px');
                                 //一级菜单回到一当前光标为中心的位置
-                                // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                            }              
+                                 accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
+                            }   
+                            	//如果菜单打开,则保持外层菜单与光标同步移动
+                            if(currentFolder.height()>0){
+                                accordion.css('top',accordion.offset().top+cursor.offset().top-currentFolder.height()/2-currentFolder.offset().top+'px') ;
+                               // accordion.scrollTop(accordion.scrollTop()+1);
+                                
+                            }
+                            else{//跟随光标移动
+                                //if(cursorStartDis!==cursor.offset().top-accordion.offset().top)
+                                    //accordion.css('top',cursor.offset().top-cursorStartDis+'px') ;
+                            }
+                                       
                                  
 						 });
 					//hide cursor
@@ -1202,7 +1215,7 @@
                 cur_trial = dummy;
                 //for log
                 stopLog = false;//start log
-                presentTrial(dummy);
+              //  presentTrial(dummy);
 				
                 
             }
