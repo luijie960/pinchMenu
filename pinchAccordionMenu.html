@@ -201,6 +201,7 @@
                 padding-left: 0;
                 height :500px;
                 overflow: auto;
+                position:relative;
             }
        
             </style>
@@ -212,7 +213,7 @@
                     // and pass the tree options as an argument to the fancytree() function:
                     $("#tree").fancytree({
                         autoCollapse: true,
-                        generateIds: true,
+                        //generateIds: true,
                         clickFolderMode: 3,
                         icon: function(event, data) {
                             return !data.node.isTopLevel();
@@ -975,21 +976,7 @@
                      });
 					//move cursor
 					 mc.on("hammer.input",function(ev){
-                //debug
-                      $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y
-                        
-                        //+";"+cursorElem.parents('li').first().attr('id')
-                        //+";"+cursorElem.attr('class')
-                        //+";"+cursorElem.parents('li').first().children('ul').first().attr('role')
-                        //+";"+cursorElem.parents('li').first().children('ul').first().attr('class')
-                        //+";"+cursorElem.parents('li').first().children('ul').first().attr('id')
-                        //+";"+cursorElem.parents('li').first().children('ul').first().height()
-                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).classList
-                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).tagName
-                        //+";"+menuHeight
-                        //+";"+parentNode.isExpanded()
-                        +";"+$('#test-container').scrollTop()
-                        ); 
+               
                         //for log    
                         pointNum = ev.pointers.length;
                         centerY =   ev.center.y;  
@@ -1033,16 +1020,19 @@
                         
                             //open or close folder
                         var menuHeight;
+                        var menuWindowElemnt;
                         if(cursorNode.getLevel()==1)//1: visible top-level node, 
                         {
                             parentNode = cursorNode;
                             menuHeight = cursorElem.parents('li').first().children('ul').first().height();
+                            menuWindowElemnt = cursorElem.parents('li').first().children('ul').first();
                         }
                         else if(cursorNode.getLevel()>1) //first sub-level, ... .
                         {
                             //parentNode = cursorElem.parents('li').first();
                             parentNode = cursorNode.getParent();
                             menuHeight = cursorElem.parents('ul').first().height();
+                            menuWindowElemnt = cursorElem.parents('ul').first();
                         }
 
                        
@@ -1054,7 +1044,7 @@
                                if(ev.scale>2)//open the menu window
                                {
                                 parentNode.setExpanded();
-                                moveStartPosY = cursor.offset().top; //set the reference pos
+                                moveStartPosY = $("#cursor").offset().top; //set the reference pos
                                }
                            }
                            else
@@ -1064,8 +1054,9 @@
                                     parentNode.setExpanded(false);
                                 }
                                 else{//scroll the menu to keep the cursor in the middle of the menu window
-                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+cursor.offset().top-moveStartPosY);
-                                   $('#tree').css('top', 100 + 'px');
+                                  // $('#test-container').scrollTop($('#test-container').scrollTop()+$("#cursor").offset().top-moveStartPosY);
+                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+10);
+                                  
                                 }
                            }
                            
@@ -1086,7 +1077,26 @@
                         //if the node is expanding, limit the cursor in the aera of the node
                         
                         $('#cursor').css('top',ev.center.y +'px');
-                         
+                         //debug
+                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y
+                        
+                        //+";"+cursorElem.parents('li').first().attr('id')
+                        //+";"+cursorElem.attr('class')
+                        +",r:"+cursorElem.parents('li').first().children('ul').first().attr('role')
+                        //+",c:"+cursorElem.parents('li').first().children('ul').first().attr('class')
+                        //+",i:"+cursorElem.parents('li').first().children('ul').first().attr('id')
+                        //+",h:"+cursorElem.parents('li').first().children('ul').first().height()
+                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).classList
+                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).tagName
+                        //+";"+menuHeight
+                        //+";"+parentNode.isExpanded()
+                        //+";s:"+$('#test-container').scrollTop()
+                        //+";t:"+menuWindowElemnt.position().top
+                        +";h:"+menuWindowElemnt.height()
+                        //+";"+menuWindowElemnt.attr('class')
+                        +",c:"+$("#cursor").offset().top
+                        +",m:"+moveStartPosY
+                                          ); 
                   
                             
                            
