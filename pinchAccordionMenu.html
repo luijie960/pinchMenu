@@ -166,7 +166,77 @@
            
             
         </style>
+<<<<<<< HEAD
         
+=======
+        <style type="text/css">
+
+            ul.fancytree-container {
+                border: 1px solid gray;
+                width: 100%;
+                overflow: auto;
+                /* The expand animations result in ugly focus outline artefacts, so hide those. */
+                outline: 0;
+                top:80px;
+            }
+            /* Display top level nodes as accordion header. */
+            ul.fancytree-container >li >.fancytree-node span.fancytree-title {
+                box-sizing: border-box;
+                width: 100%;
+                padding: 4px;
+                margin: 0;
+                background-color: #ddd;
+                border: 1px solid #bbb;
+                font-weight: 550;
+                height: 40px;
+            }
+            /* Hide  expanders for top-level nodes */
+            ul.fancytree-container >li >.fancytree-node .fancytree-expander {
+                display: none;
+                
+            }
+            /* Don't indent level-2 nodes */
+            ul.fancytree-container >li >ul {
+                padding-left: 0;
+                height :500px;
+                overflow: auto;
+            }
+       
+            </style>
+            
+            <!-- Add code to initialize the tree when the document is loaded: -->
+            <script type="text/javascript">
+                $(function(){
+                    // Attach the fancytree widget to an existing <div id="tree"> element
+                    // and pass the tree options as an argument to the fancytree() function:
+                    $("#tree").fancytree({
+                        autoCollapse: true,
+                        generateIds: true,
+                        clickFolderMode: 3,
+                        icon: function(event, data) {
+                            return !data.node.isTopLevel();
+                        },
+                       
+                        
+                        keydown: function(event, data){
+                            switch( $.ui.fancytree.eventToString(data.originalEvent) ) {
+                            case "return":
+                            case "space":
+                                data.node.toggleExpanded();
+                                //$("#tree").fancytree("getTree").activateKey("ui-id-1");
+                                
+                               // alert("space");
+                                break;
+                            }
+                        }
+                    });
+                    
+                     //$("#tree").fancytree("getTree").activateKey("ui-id-1");
+                    // $("#tree").fancytree("getTree").getNodeByKey("10_1_1").setActive();
+                });
+                
+            </script>
+>>>>>>> parent of a2d40c8... save prepare to return to original accordion  menu
     </head>
     <body >
         <div id="cursor" class="cursor"></div>
@@ -1094,7 +1164,8 @@
 
                      mc.get('pinch').set({ enable: true });
 					//move cursor
-					 mc.on("hammer.input",function(ev){
+					 mc.on("hammer.input",function(ev)
+                     {
                         $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
                         //for log    
                         pointNum = ev.pointers.length;//touch point number
@@ -1145,16 +1216,18 @@
                         else 
                             if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
                         
-                        //获取光标处的元素
-                        // var cursorElem = document.elementFromPoint(ev.center.x, ev.center.y);
-                        var cursorElem = $(document.elementFromPoint(ev.center.x, ev.center.y));
-
-
-                        //hover效果呈现
-                        if (lastHover ) lastHover.removeClass('hover');
-                        if (!cursorElem.hasClass('hover')) {
-                            cursorElem.addClass('hover');
-                            lastHover = cursorElem;
+                            //open or close folder
+                        var menuHeight;
+                        if(cursorNode.getLevel()==1)//1: visible top-level node, 
+                        {
+                            parentNode = cursorNode;
+                            menuHeight = cursorElem.parents('li').first().children('ul').first().height();
+                        }
+                        else if(cursorNode.getLevel()>1) //first sub-level, ... .
+                        {
+                            //parentNode = cursorElem.parents('li').first();
+                            parentNode = cursorNode.getParent();
+                            menuHeight = cursorElem.parents('ul').first().height();
                         }
                             
                             //设置父菜单节点
@@ -1166,12 +1239,37 @@
                                 currentFolder = cursorElem.parents('.subDiv').first(); //当前元素所在的folder
 
 
-                            if(currentFolder !== lastFolder) {
-                                if(lastFolder) {
-                                    lastFolder.css('height', 0);
+                        if(parentNode&&parentNode.folder) 
+                        {   
+                           if(!parentNode.isExpanded())
+                           {
+                               if(ev.scale>2)//open the menu window
+                               {
+                                parentNode.setExpanded();
+                                moveStartPosY = cursor.offset().top; //set the reference pos
+                               }
+                           }
+                           else
+                           {
+                                if(ev.scale<1.2)//close the menu window
+                                {
+                                    parentNode.setExpanded(false);
                                 }
-                                lastFolder = currentFolder;
-                            }
+                                else{//scroll the menu to keep the cursor in the middle of the menu window
+                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+cursor.offset().top-moveStartPosY);
+                                   $('#tree').css('top', 100 + 'px');
+                                }
+                           }
+                           
+                            // if (!parentNode.isExpanded()&&ev.scale > 2) {
+                                
+                               
+                            // } else if (parentNode.isExpanded()&&ev.scale <1.2) {
+                                
+                            //     //treeIterm.css('height', 40 + 'px');
+                            //     //一级菜单回到一当前光标为中心的位置
+                            //     // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
+                            // }
 
                             //根据pinch修改菜单的高度
                             //var subD =  document.getElementById('subDiv');
@@ -1181,22 +1279,24 @@
                                 currentFolder.css('height', folderHeight + 'px');
                                 //accordion.css('top',accordion.position().top-heightInc/2+'px') ;
 
-                            } else if (folderHeight < currentFolder.height() * 0.7) {
-                                currentFolder.css('height', 0 + 'px');
-                                //一级菜单回到一当前光标为中心的位置
-                                 accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                            }   
-                            	//如果菜单打开,则保持外层菜单与光标同步移动
-                            if(currentFolder.height()>0){
-                                accordion.css('top',accordion.offset().top+cursor.offset().top-currentFolder.height()/2-currentFolder.offset().top+'px') ;
-                               // accordion.scrollTop(accordion.scrollTop()+1);
-                                
-                            }
-                            else{//跟随光标移动
-                                //if(cursorStartDis!==cursor.offset().top-accordion.offset().top)
-                                    //accordion.css('top',cursor.offset().top-cursorStartDis+'px') ;
-                            }
-                                       
+                        }
+                        }
+                         //move cursor
+                            
+                        //if the node is expanding, limit the cursor in the aera of the node
+                        
+                        $('#cursor').css('top',ev.center.y +'px');
+                         
+                  
+                            
+                           
+                             
+                       
+                     
+
+                       
+                        
+                                      
                                  
 						 });
 					//hide cursor
