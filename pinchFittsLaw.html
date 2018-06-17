@@ -702,13 +702,13 @@
 					 mc.on("hammer.input",function(ev){
                         $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
                         //for log    
-                        pointNum = ev.pointers.length;
+                        pointNum = ev.pointers.length;//touch point number
                         centerY =   ev.center.y;  
                         
                         
                         //make sure input is pinch
                         
-                    if(ev.pointers.length==1)
+                    if(ev.pointers.length==1)//just from 2 touch point to 1 touch point,find out which point lost
                     {
                         var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
                         var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
@@ -726,7 +726,7 @@
                     }
                            
                         if (ev.pointers.length != 2)  return;
-                        $('#cursor').css('top',ev.center.y +'px');
+                        $('#cursor').css('top',ev.center.y +'px');//move cursor to center of touch points
                          //for log, record location for touch point
                         p1x = ev.pointers[0].x;
                         p1y = ev.pointers[0].y;

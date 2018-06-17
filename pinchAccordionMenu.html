@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scaleable=no">
         
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
-        <link rel="stylesheet" href="http://raw.githack.com/luijie960/pinchMenu/master/style.css" media="screen" type="text/css" />
+        
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="http://hammerjs.github.io/dist/hammer.min.js"></script> 
@@ -16,7 +16,11 @@
         <script src="http://raw.githack.com/hhurz/tableExport.jquery.plugin/master/tableExport.min.js"></script>
         <script src="http://raw.githack.com/luijie960/pinchMenu/master/js/debugout.js"></script>
         <script src="http://raw.githack.com/carhartl/jquery-cookie/master/src/jquery.cookie.js"></script>
-        
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	    <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+	    <link href="http://raw.githack.com/mar10/fancytree/master/src/skin-win8/ui.fancytree.css" rel="stylesheet">
+	    <script src="http://raw.githack.com/mar10/fancytree/master/src/jquery.fancytree.js"></script>
 
         <style>
 		
@@ -24,7 +28,7 @@
 							height:1px;
 							top:0px; 
 							position:relative;
-							z-index:999;
+							z-index:100;
 							pointer-events:none;
 							display:inline-block;
 							margin:0px;
@@ -80,7 +84,6 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
-                z-index: 900;
             }
 			 #debug-overlay {
                 position: fixed;
@@ -92,7 +95,7 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
-                z-index: 900;
+                z-index: 9999
             }
             
             #test-container {
@@ -102,6 +105,7 @@
                 -khtml-user-select: none;
                 -webkit-user-select: none;
                 user-select: none;
+                overflow:auto;
             }
             
             #interstitial-overlay {
@@ -166,9 +170,6 @@
            
             
         </style>
-<<<<<<< HEAD
-        
-=======
         <style type="text/css">
 
             ul.fancytree-container {
@@ -177,7 +178,8 @@
                 overflow: auto;
                 /* The expand animations result in ugly focus outline artefacts, so hide those. */
                 outline: 0;
-                top:80px;
+                margin-top:320px;
+                margin-bottom: 320px;
             }
             /* Display top level nodes as accordion header. */
             ul.fancytree-container >li >.fancytree-node span.fancytree-title {
@@ -193,16 +195,14 @@
             /* Hide  expanders for top-level nodes */
             ul.fancytree-container >li >.fancytree-node .fancytree-expander {
                 display: none;
-                
             }
             /* Don't indent level-2 nodes */
             ul.fancytree-container >li >ul {
                 padding-left: 0;
-                height :500px;
+                height :100px;
                 overflow: auto;
-                position:relative;
             }
-       
+            
             </style>
             
             <!-- Add code to initialize the tree when the document is loaded: -->
@@ -212,7 +212,7 @@
                     // and pass the tree options as an argument to the fancytree() function:
                     $("#tree").fancytree({
                         autoCollapse: true,
-                        //generateIds: true,
+                        
                         clickFolderMode: 3,
                         icon: function(event, data) {
                             return !data.node.isTopLevel();
@@ -237,7 +237,6 @@
                 });
                 
             </script>
->>>>>>> parent of a2d40c8... save prepare to return to original accordion  menu
     </head>
     <body >
         <div id="cursor" class="cursor"></div>
@@ -252,6 +251,7 @@
                     <option value="pinchIn">pinchIn</option>
                     <option value="pinchOut">pinchOut</option>
                     <option value="tap">tap</option>
+                    
                 </select>
                 <br/>
                 
@@ -313,400 +313,196 @@
         <div id="test-container" class="fullscreen" >
             <div id="ribbon-1" class="ribbon" style="top:50px;"></div>
             <div id="ribbon-2" class="ribbon target" style="top:300px;"></div>
+
+
             <div id="trial-overlay">Practice</div>
 			<div id="debug-overlay"> debug</div>
             <div id="debug"><ol id="debugitems"><li>debug</li></ol></div>
             <div id="interstitial-overlay" class="fullscreen">
                 <div id="interstitial-box">Starting next test in a few seconds...</div>
             </div>
+            <div id="tree" >
             
-            <ul id="accordion" class="accordion" >
-                <li>
-                    <div class="link folder"><i class="fa fa-paint-brush"></i>1<i class="fa fa-chevron-down"></i></div>
-                    <div id="subDiv" class="subDiv" >
-                        <ul  class="submenu" >
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
+                <ul>
+                    <li id="1" class="folder">Standard nodes, modified by extra CSS rules
+                      <ul>
+                        <li id="node_4.1">Sub-item 4.1
+                        <li id="node_4.2">Sub-item 4.2
+                        <li id="node_4.3">Sub-item 4.3
+                        <li id="node_4.4">Sub-item 4.4
+                        <li id="node_4.5">Sub-item 4.5
+                        <li id="node_4.6">Sub-item 4.6
+                        <li id="node_4.7">Sub-item 4.7
+                        <li id="node_4.8">Sub-item 4.8
+                        <li id="node_4.9">Sub-item 4.9
+                        <li id="node_4.10">Sub-item 4.10
+                        <li id="node_4.11">Sub-item 4.11
+                        <li id="node_4.12">Sub-item 4.12
+                        <li id="node_4.13">Sub-item 4.13
+                        <li id="node_4.14">Sub-item 4.14
+                        <li id="node_4.15">Sub-item 4.15
+                        <li id="node_4.16">Sub-item 4.16    
+                      </ul>
+              
+                    <li id="2" class="folder">Override CSS style per node
+                      <ul>
+                        <li class="custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                        <li class="folder custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                      </ul>
+              
+                    <li id="3" class="folder">Use 'data-NAME' attributes to define additional data
+                      <ul>
+                        <li data-icon="customDoc1.gif">Node with standard CSS, but custom icon
+                        <li class="folder" data-icon="folder_docs.gif">Folder with standard CSS but custom icon
+                        <li data-icon="ui-icon ui-icon-heart">'icon' is directly added to the image &lt;span>, so jQuery stock icons may be used
+                      </ul>
+              
+                    <li id="4" class="folder">Use 'data-json' attribute to define additional data
+                      <ul>
+                        <li data-json='{"icon": "customDoc1.gif"}'>Node with standard CSS, but custom 'data-icon'
+                      </ul>
+              
+                    <li id="5" class="folder">Use render callback
+                      <ul>
+                        <li id="renderNode1" data-cstrender="true">Node hat will be handled by 'render' calback
+                      </ul>
+                      <li id="1" class="folder">Standard nodes, modified by extra CSS rules
+                        <ul>
+                          <li id="node_4.1">Sub-item 4.1
+                          <li id="node_4.2">Sub-item 4.2
+                          <li id="node_4.3">Sub-item 4.3
+                          <li id="node_4.4">Sub-item 4.4
+                          <li id="node_4.5">Sub-item 4.5
+                          <li id="node_4.6">Sub-item 4.6
+                          <li id="node_4.7">Sub-item 4.7
+                          <li id="node_4.8">Sub-item 4.8
+                          <li id="node_4.9">Sub-item 4.9
+                          <li id="node_4.10">Sub-item 4.10
+                          <li id="node_4.11">Sub-item 4.11
+                          <li id="node_4.12">Sub-item 4.12
+                          <li id="node_4.13">Sub-item 4.13
+                          <li id="node_4.14">Sub-item 4.14
+                          <li id="node_4.15">Sub-item 4.15
+                          <li id="node_4.16">Sub-item 4.16    
                         </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-code"></i>2<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
+                
+                      <li id="2" class="folder">Override CSS style per node
+                        <ul>
+                          <li class="custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                          <li class="folder custom1">class="custom1": Additional classes are copied over to outer &lt;span>
                         </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-mobile"></i>3<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
+                
+                      <li id="3" class="folder">Use 'data-NAME' attributes to define additional data
+                        <ul>
+                          <li data-icon="customDoc1.gif">Node with standard CSS, but custom icon
+                          <li class="folder" data-icon="folder_docs.gif">Folder with standard CSS but custom icon
+                          <li data-icon="ui-icon ui-icon-heart">'icon' is directly added to the image &lt;span>, so jQuery stock icons may be used
                         </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>4<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
+                
+                      <li id="4" class="folder">Use 'data-json' attribute to define additional data
+                        <ul>
+                          <li data-json='{"icon": "customDoc1.gif"}'>Node with standard CSS, but custom 'data-icon'
                         </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-paint-brush"></i>5<i class="fa fa-chevron-down"></i></div>
-                    <div id="subDiv" class="subDiv" >
-                        <ul  class="submenu" >
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
+                
+                      <li id="5" class="folder">Use render callback
+                        <ul>
+                          <li id="renderNode1" data-cstrender="true">Node hat will be handled by 'render' calback
                         </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-code"></i>6<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-mobile"></i>7<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>8<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>9<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>10<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>11<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>12<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>13<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="link folder"><i class="fa fa-globe"></i>14<i class="fa fa-chevron-down"></i></div>
-                    <div class="subDiv" >
-                        <ul class="submenu">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">6</a></li>
-                            <li><a href="#">7</a></li>
-                            <li><a href="#">8</a></li>
-                            <li><a href="#">9</a></li>
-                            <li><a href="#">10</a></li>
-                            <li><a href="#">11</a></li>
-                            <li><a href="#">12</a></li>
-                            <li><a href="#">13</a></li>
-                            <li><a href="#">14</a></li>
-                            <li><a href="#">15</a></li>
-                            <li><a href="#">16</a></li>
-                            <li><a href="#">17</a></li>
-                            <li><a href="#">18</a></li>
-                            <li><a href="#">19</a></li>
-                            <li><a href="#">20</a></li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
+                        <li id="1" class="folder">Standard nodes, modified by extra CSS rules
+                            <ul>
+                              <li id="node_4.1">Sub-item 4.1
+                              <li id="node_4.2">Sub-item 4.2
+                              <li id="node_4.3">Sub-item 4.3
+                              <li id="node_4.4">Sub-item 4.4
+                              <li id="node_4.5">Sub-item 4.5
+                              <li id="node_4.6">Sub-item 4.6
+                              <li id="node_4.7">Sub-item 4.7
+                              <li id="node_4.8">Sub-item 4.8
+                              <li id="node_4.9">Sub-item 4.9
+                              <li id="node_4.10">Sub-item 4.10
+                              <li id="node_4.11">Sub-item 4.11
+                              <li id="node_4.12">Sub-item 4.12
+                              <li id="node_4.13">Sub-item 4.13
+                              <li id="node_4.14">Sub-item 4.14
+                              <li id="node_4.15">Sub-item 4.15
+                              <li id="node_4.16">Sub-item 4.16    
+                            </ul>
+                    
+                          <li id="2" class="folder">Override CSS style per node
+                            <ul>
+                              <li class="custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                              <li class="folder custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                            </ul>
+                    
+                          <li id="3" class="folder">Use 'data-NAME' attributes to define additional data
+                            <ul>
+                              <li data-icon="customDoc1.gif">Node with standard CSS, but custom icon
+                              <li class="folder" data-icon="folder_docs.gif">Folder with standard CSS but custom icon
+                              <li data-icon="ui-icon ui-icon-heart">'icon' is directly added to the image &lt;span>, so jQuery stock icons may be used
+                            </ul>
+                    
+                          <li id="4" class="folder">Use 'data-json' attribute to define additional data
+                            <ul>
+                              <li data-json='{"icon": "customDoc1.gif"}'>Node with standard CSS, but custom 'data-icon'
+                            </ul>
+                    
+                          <li id="5" class="folder">Use render callback
+                            <ul>
+                              <li id="renderNode1" data-cstrender="true">Node hat will be handled by 'render' calback
+                            </ul>
+                            <li id="1" class="folder">Standard nodes, modified by extra CSS rules
+                                <ul>
+                                  <li id="node_4.1">Sub-item 4.1
+                                  <li id="node_4.2">Sub-item 4.2
+                                  <li id="node_4.3">Sub-item 4.3
+                                  <li id="node_4.4">Sub-item 4.4
+                                  <li id="node_4.5">Sub-item 4.5
+                                  <li id="node_4.6">Sub-item 4.6
+                                  <li id="node_4.7">Sub-item 4.7
+                                  <li id="node_4.8">Sub-item 4.8
+                                  <li id="node_4.9">Sub-item 4.9
+                                  <li id="node_4.10">Sub-item 4.10
+                                  <li id="node_4.11">Sub-item 4.11
+                                  <li id="node_4.12">Sub-item 4.12
+                                  <li id="node_4.13">Sub-item 4.13
+                                  <li id="node_4.14">Sub-item 4.14
+                                  <li id="node_4.15">Sub-item 4.15
+                                  <li id="node_4.16">Sub-item 4.16    
+                                </ul>
+                        
+                              <li id="2" class="folder">Override CSS style per node
+                                <ul>
+                                  <li class="custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                                  <li class="folder custom1">class="custom1": Additional classes are copied over to outer &lt;span>
+                                </ul>
+                        
+                              <li id="3" class="folder">Use 'data-NAME' attributes to define additional data
+                                <ul>
+                                  <li data-icon="customDoc1.gif">Node with standard CSS, but custom icon
+                                  <li class="folder" data-icon="folder_docs.gif">Folder with standard CSS but custom icon
+                                  <li data-icon="ui-icon ui-icon-heart">'icon' is directly added to the image &lt;span>, so jQuery stock icons may be used
+                                </ul>
+                        
+                              <li id="4" class="folder">Use 'data-json' attribute to define additional data
+                                <ul>
+                                  <li data-json='{"icon": "customDoc1.gif"}'>Node with standard CSS, but custom 'data-icon'
+                                </ul>
+                        
+                              <li id="5" class="folder">Use render callback
+                                <ul>
+                                  <li id="renderNode1" data-cstrender="true">Node hat will be handled by 'render' calback
+                                </ul>
+              
+                  </ul>
+                  </div>
+                  
         </div>
         
 		    
         
         
         <script type="text/javascript">
-          
+            
             /* Simple Fitts' Law testing script
              *   pardon the hackishness
              *
@@ -777,20 +573,22 @@
             var p2x = 0;
             var p2y = 0;
             var centerY = 0;//record touch point center
-//accordion menu
-            
-            //var accordionElm = document.getElementById('accordion');
-            var accordion = $('#accordion');
-           //var mc = new Hammer(accordionElm);
+//var for accordion menu
             var lastHover;
             var currentFolder;
             var lastFolder;
+            var moveStartPosY;
+            var parentNode;
+            var parentObject;
+            var parentNodeOpen=false;
+            var cursorElem;
+            const MENU_ITERM_HEIGHT = 40;
+            const MARGIN=320;
+            var menuWinObject;
 
             var cursor = $('#cursor');
-            var cursorStartDis = 0;
-
-            var myElement = document.getElementById("test-container");
-			var mc = new Hammer(myElement);
+            var testContainer = $(document.getElementById("test-container"));
+			var mc = new Hammer(document.getElementById("test-container"));
             //load local store cookie to input element   
             $("#width").val(localStorage.getItem("physical_width"));
             $("#height").val(localStorage.getItem("physical_height"));
@@ -877,7 +675,22 @@
                 exitFullscreen();
             });
 		
+            function setFolderHeight(scale){
+                //根据pinch修改菜单的高度
+                //var subD =  document.getElementById('subDiv');
+                var folderHeight = scale*Math.round(resolution_height/10);
+                var heightInc = folderHeight - currentFolder.height();
+                if ( scale>2&&heightInc > 0) {
+                    currentFolder.css('height', folderHeight + 'px');
+                   
 
+                } else if (folderHeight < currentFolder.height() * 0.7) {
+                    currentFolder.css('height', 0 + 'px');
+                    //一级菜单回到一当前光标为中心的位置
+                    // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
+                }
+                            
+            }
 			// Find the right method, call on correct element
 			function launchIntoFullscreen() {
 				//var element = document.getElementById('test-container');
@@ -919,13 +732,8 @@
             
             function isFull() {
                 var fullscreenElement =
-                    document.fullscreenEnabled
-                    || document.mozFullscreenElement
-                    || document.webkitFullscreenElement;
-                var fullscreenEnabled =
-                    document.fullscreenEnabled
-                    || document.mozFullscreenEnabled
-                    || document.webkitFullscreenEnabled;
+                    document.fullscreenEnabled|| document.mozFullscreenElement|| document.webkitFullscreenElement;
+                var fullscreenEnabled =document.fullscreenEnabled|| document.mozFullscreenEnabled|| document.webkitFullscreenEnabled;
                 if (fullscreenElement == null)
                 {
                     return false;
@@ -1165,14 +973,118 @@
 
                      mc.get('pinch').set({ enable: true });
 					//move cursor
-<<<<<<< HEAD
-					 mc.on("hammer.input",function(ev)
-                     {
-                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y);  
-=======
 					 mc.on("hammer.input",function(ev){
-<<<<<<< HEAD
-                //debug
+                
+                        //for log    
+                        pointNum = ev.pointers.length;
+                        centerY =   ev.center.y;  
+                        
+                        
+                        //make sure input is pinch
+                        
+                        if(ev.pointers.length==1)
+                        {
+                            var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
+                            var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
+                            if(d1<d2)
+                            {
+                                p1x = ev.pointers[0].x;
+                                p1y = ev.pointers[0].y;
+                            }
+                            else
+                            {
+                                p2x = ev.pointers[0].x;
+                                p2y = ev.pointers[0].y;
+                            } 
+                            return;
+                        }
+                           
+                        if (ev.pointers.length != 2)  return;
+                         //for log, record location for touch point
+                        p1x = ev.pointers[0].x;
+                        p1y = ev.pointers[0].y;
+                        p2x = ev.pointers[1].x;
+                        p2y = ev.pointers[1].y;
+                        //move cursor
+                         
+                            // if(parentNode&&(!parentNode.isExpanded())&&parentNodeOpen)
+                            // {}
+                            // else
+                            {
+                            if(!(ev.scale>1.2&&!parentNodeOpen))//is pinching  , stop the cursor
+                            {cursorElem = $(document.elementFromPoint(ev.center.x, ev.center.y));
+                            
+                             $('#cursor').css('top',ev.center.y +'px');
+                            }
+                            }
+                         
+                        //获取光标处的元素
+                        
+                        
+                                        
+
+                        //set the treeIterm to  focus
+                       // $("#tree").fancytree("getTree").getNodeByKey("node_4.2").setFocus();
+                       var node = $.ui.fancytree.getNode(cursorElem);
+                        if(node)node.setActive();
+                       
+                        cursorNode = $.ui.fancytree.getNode(cursorElem);
+                        if(cursorNode)cursorNode.setActive();
+                        else return;
+                        
+                                //open or close folder
+                        var menuWinHeight;
+                        if(cursorNode.getLevel()==1)//1: visible top-level node, 
+                        {
+                            parentNode = cursorNode;
+                            
+                            parentObject = cursorElem;//store the ui object for menu position
+                            menuWinObject = cursorElem.parents('li').first().children('ul').first();
+                            menuWinHeight = menuWinObject.height();
+                        }
+                        else if(cursorNode.getLevel()>1) //first sub-level, ... .
+                        {
+                            //parentNode = cursorElem.parents('li').first();
+                            parentNode = cursorNode.getParent();
+                            menuWinObject = cursorElem.parents('ul').first()
+                            menuWinHeight = menuWinObject.height();
+                        }
+
+                       
+
+                        if(parentNode) 
+                        {   
+                           if(!parentNodeOpen)
+                           {
+                               if(ev.scale>2&&!parentNode.isExpanded())//open the menu window
+                               {
+                                
+                                parentNode.setExpanded(true,true);//no animation
+                                //moveStartPosY = cursor.offset().top; //set the reference pos
+                                //if(!parentNodeOpen)testContainer.scrollTop(testContainer.scrollTop()+40);
+                                
+                                parentNodeOpen = true;
+                                }
+                           }
+                           else// node has start to expand
+                           {
+                                if(parentNodeOpen&&ev.scale<2)//close the menu window
+                                {   parentNodeOpen = false;
+                                    parentNode.setExpanded(false,true);//no animation
+                                }
+                                else{//scroll the menu to keep the cursor in the middle of the menu window
+                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+cursor.offset().top-moveStartPosY);
+                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+parentObject.offset().top);
+                                   //var menuWinCenterH = parentObject.offset().top+parentObject.height()+Math.round(menuWinHeight/2);
+                                  // testContainer.scrollTop(testContainer.scrollTop()+menuWinCenterH-cursor.offset().top);
+                                  var menuWinCenterScrollHeight = MARGIN+(parentNode.getIndex()+1)*MENU_ITERM_HEIGHT+Math.round(menuWinHeight/2);
+                                  testContainer.scrollTop(menuWinCenterScrollHeight-cursor.offset().top);
+                                }
+                           }
+                        }
+                        
+                         
+                       //debug
                       $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y
                         
                         //+";"+cursorElem.parents('li').first().attr('id')
@@ -1180,165 +1092,16 @@
                         //+";"+cursorElem.parents('li').first().children('ul').first().attr('role')
                         //+";"+cursorElem.parents('li').first().children('ul').first().attr('class')
                         //+";"+cursorElem.parents('li').first().children('ul').first().attr('id')
-                        //+";"+cursorElem.parents('li').first().children('ul').first().height()
-                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).classList
-                        //+";"+document.elementFromPoint(ev.center.x, ev.center.y).tagName
-                        //+";"+menuHeight
-                        //+";"+parentNode.isExpanded()
-                        +";"+$('#test-container').scrollTop()
-                        ); 
-<<<<<<< HEAD
->>>>>>> parent of a2d40c8... save prepare to return to original accordion  menu
-=======
->>>>>>> parent of a2d40c8... save prepare to return to original accordion  menu
-=======
-               
->>>>>>> parent of 6764450... Revert "save prepare to return to original accordion  menu"
-                        //for log    
-                        pointNum = ev.pointers.length;//touch point number
-                        centerY =   ev.center.y;  
-                        
-                        
-                        //make sure input is pinch
-                        
-                    if(ev.pointers.length==1)//just from 2 touch point to 1 touch point,find out which point lost
-                    {
-                        var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
-                        var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
-                        if(d1<d2)
-                        {
-                            p1x = ev.pointers[0].x;
-                            p1y = ev.pointers[0].y;
-                        }
-                        else
-                        {
-                            p2x = ev.pointers[0].x;
-                            p2y = ev.pointers[0].y;
-                        } 
-                        return;
-                    }
-                           
-                        if (ev.pointers.length != 2)  return;
-                        $('#cursor').css('top',ev.center.y +'px');//move cursor to center of touch points
-                         //for log, record location for touch point
-                        p1x = ev.pointers[0].x;
-                        p1y = ev.pointers[0].y;
-                        p2x = ev.pointers[1].x;
-                        p2y = ev.pointers[1].y;
-
-                         var y = ev.center.y;
-                        //find out where active bar is located
-                        var minY1 = parseInt($("#ribbon-1").css('top'));
-                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($("#ribbon-1").css('height'));
-                        var minY2 = parseInt($("#ribbon-2").css('top'));
-                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($("#ribbon-2").css('height'));
-                        
-                        if(y >= minY1 && y <= maxY1)
-                             $("#ribbon-1").addClass('hover');
-                        else 
-                            if($("#ribbon-1").hasClass('hover')) $("#ribbon-1").removeClass('hover');
-                        if(y >= minY2 && y <= maxY2)
-                             $("#ribbon-2").addClass('hover');
-                       
-                        else 
-                            if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
-                        
-                            //open or close folder
-                        var menuHeight;
-                        var menuWindowElemnt;
-                        if(cursorNode.getLevel()==1)//1: visible top-level node, 
-                        {
-                            parentNode = cursorNode;
-                            menuHeight = cursorElem.parents('li').first().children('ul').first().height();
-                            menuWindowElemnt = cursorElem.parents('li').first().children('ul').first();
-                        }
-                        else if(cursorNode.getLevel()>1) //first sub-level, ... .
-                        {
-                            //parentNode = cursorElem.parents('li').first();
-                            parentNode = cursorNode.getParent();
-                            menuHeight = cursorElem.parents('ul').first().height();
-                            menuWindowElemnt = cursorElem.parents('ul').first();
-                        }
-                            
-                            //设置父菜单节点
-                            if (cursorElem.hasClass('folder')) //当前元素为folder
-                                currentFolder = cursorElem.next('.subDiv');
-                            else if (cursorElem.hasClass('subDiv'))
-                                currentFolder = cursorElem; //当前元素为subDiv
-                            else if (cursorElem.parents('.subDiv'))
-                                currentFolder = cursorElem.parents('.subDiv').first(); //当前元素所在的folder
-
-
-                        if(parentNode&&parentNode.folder) 
-                        {   
-                           if(!parentNode.isExpanded())
-                           {
-                               if(ev.scale>2)//open the menu window
-                               {
-                                parentNode.setExpanded();
-                                moveStartPosY = $("#cursor").offset().top; //set the reference pos
-                               }
-                           }
-                           else
-                           {
-                                if(ev.scale<1.2)//close the menu window
-                                {
-                                    parentNode.setExpanded(false);
-                                }
-                                else{//scroll the menu to keep the cursor in the middle of the menu window
-                                  // $('#test-container').scrollTop($('#test-container').scrollTop()+$("#cursor").offset().top-moveStartPosY);
-                                   //$('#test-container').scrollTop($('#test-container').scrollTop()+10);
-                                  
-                                }
-                           }
-                           
-                            // if (!parentNode.isExpanded()&&ev.scale > 2) {
-                                
-                               
-                            // } else if (parentNode.isExpanded()&&ev.scale <1.2) {
-                                
-                            //     //treeIterm.css('height', 40 + 'px');
-                            //     //一级菜单回到一当前光标为中心的位置
-                            //     // accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                            // }
-
-                            //根据pinch修改菜单的高度
-                            //var subD =  document.getElementById('subDiv');
-                            var folderHeight = ev.scale * 60;
-                            var heightInc = folderHeight - currentFolder.height();
-                            if (ev.scale > 2 && heightInc > 0) {
-                                currentFolder.css('height', folderHeight + 'px');
-                                //accordion.css('top',accordion.position().top-heightInc/2+'px') ;
-
-                        }
-                        }
-                         //move cursor
-                            
-                        //if the node is expanding, limit the cursor in the aera of the node
-                        
-                        $('#cursor').css('top',ev.center.y +'px');
-                         //debug
-                        $("#debug-overlay").text(ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y
-                        
-                        //+";"+cursorElem.parents('li').first().attr('id')
-                        //+";"+cursorElem.attr('class')
-                        +",r:"+cursorElem.parents('li').first().children('ul').first().attr('role')
-                        //+",c:"+cursorElem.parents('li').first().children('ul').first().attr('class')
-                        //+",i:"+cursorElem.parents('li').first().children('ul').first().attr('id')
                         //+",h:"+cursorElem.parents('li').first().children('ul').first().height()
                         //+";"+document.elementFromPoint(ev.center.x, ev.center.y).classList
                         //+";"+document.elementFromPoint(ev.center.x, ev.center.y).tagName
-                        //+";"+menuHeight
+                        //+",t:"+cursorElem.offset().top
+                        //+",i:"+parentNode.getIndex()
                         //+";"+parentNode.isExpanded()
-                        //+";s:"+$('#test-container').scrollTop()
-                        //+";t:"+menuWindowElemnt.position().top
-                        +";h:"+menuWindowElemnt.height()
-                        //+";"+menuWindowElemnt.attr('class')
-                        +",c:"+$("#cursor").offset().top
-                        +",m:"+moveStartPosY
-                                          ); 
-                  
-                            
+                        // +",m:"+menuWinHeight
+                        +",s:"+$('#test-container').scrollTop()
+                         +",e:"+ev.scale
+                        );    
                            
                              
                        
@@ -1349,10 +1112,7 @@
                                       
                                  
 						 });
-					//hide cursor
-					// mc.on("pinchend",function(ev){
-					// 	$('#cursor').css('display','none');
-					// });
+				
 
 					mc.on("hammer.input",trialPinch);
 					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
@@ -1365,11 +1125,14 @@
                 cur_trial = dummy;
                 //for log
                 stopLog = false;//start log
-              //  presentTrial(dummy);
+                presentTrial(dummy);
 				
                 
             }
-            
+            function getElsAt(top, left){
+                //return $("body").find("*").filter(function(){return $(this).offset().top == top && $(this).offset().left == left})
+                return $("#tree").find("*").filter(function(){return $(this).offset().top <= top &&  ($(this).offset().top+$(this).height)>=top})
+                }
             function queueNextTrial() {
                 
                 total_repetitions++;
@@ -1650,7 +1413,7 @@
 			}
 
             function writeLog()
-            {
+            {return;
                 if(stopLog)return;
                var minY = parseInt($(".target").css('top'));
                var maxY = parseInt($(".target").css('top')) + parseInt($(".target").css('height'));
