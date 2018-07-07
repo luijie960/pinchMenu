@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scaleable=no">
         
         <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
-        <link rel="stylesheet" href="https://raw.githack.com/luijie960/pinchMenu/master/style.css" media="screen" type="text/css" />
+        <link rel="stylesheet" href="https://raw.githack.com/luijie960/pinchMenu/master/style.css" />
         <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="https://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
         <script src="https://hammerjs.github.io/dist/hammer.min.js"></script> 
@@ -196,7 +196,7 @@
                 <select id ="menunum">
                     <option value="20">20</option>
                     <option value="40">40</option>
-                    <option value="60">60</option>
+                    <option value="60" selected>60</option>
                 </select>
                 <br/>
                 <input id="physicalSizeN" type="radio" name="physicalSize" value="no" onclick='$("#physicalSizeInput").hide();'  > 
@@ -973,7 +973,7 @@
                                 //task 2
 
                                
-                                if($("#type").val()=="pinch-page")
+                                if($("#type").val()=="edge-page-turn")
                                 {
                                   
 
@@ -1006,7 +1006,7 @@
                                   
                                 }
                                 //task 3
-                                if(($("#type").val()=="pinch-three-fingger"))
+                                if(($("#type").val()=="pinch-page-turn"))
                                 {    
                                     var animation = false;                              
                                        if(deltaD!=0)
