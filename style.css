@@ -56,13 +56,29 @@ h1 a {
 	top:0px;
 	overflow: auto;
 	z-index: 200;
+
+	
 	
  }
+ /* LCY */
+.accordion {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+.accordion > :first-child {
+	padding-top: 540px;
+}
+.accordion > :last-child {
+	padding-bottom: 540px;
+}
+/* LCY */
 
 .accordion .link {
 	
 	display: block;
-	padding: 15px 15px 15px 42px;
+	
+	padding-left: 15px;
+	
 	color: #4D4D4D;
 	font-size: 14px;
 	font-weight: 700;
@@ -73,6 +89,8 @@ h1 a {
 	transition: all 0.4s ease;
 	z-index:10;
 	background: rgb(245, 241, 241);
+	height: 32px;
+	line-height: 32px;
 	
 	
 }
@@ -126,6 +144,7 @@ h1 a {
 
  .submenu li {
 	 border-bottom: 1px solid #4b4a5e;
+	 height: 32px;
 	 
  }
 
@@ -165,3 +184,12 @@ h1 a {
   height: 0px;
   
 }
+
+.subDiv > :first-child{
+	padding-top: 540px;
+		
+  }
+  .subDiv > :last-child{
+	padding-bottom: 540px;
+	
+  }

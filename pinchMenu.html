@@ -80,6 +80,7 @@
                 border: 1px solid #888888;
                 font-size: smaller;
                 text-align: right;
+                display:none;
             }
 			 #debug-overlay {
                 position: fixed;
@@ -93,6 +94,7 @@
                 text-align: right;
                 z-index: 999;
                 word-wrap:break-word;
+                
             }
             
             #test-container {
@@ -143,6 +145,7 @@
                 padding: 3px;
                 display:none;
                 height: 50px;
+                
 
                 
                 
@@ -177,16 +180,16 @@
         <div id="cursor" class="cursor"></div>
         
         <div id="start-overlay" class="centered">
-            <h3>Welcome to the Fitts' Law Testing App</h3>
+            <h3>Welcome to the Pinch Testing App</h3>
             <p> Your Name: <input id="name" type="text" value="test" onfocus="if(value==='test')value=''" onblur="if(value==='')value='test'"></p>
             <p>
                 Guesture  Type:
                 <select id="type">
                     
-                    <option value="pinch-scroll">pinch-scroll</option>
-                    <option value="pinch-page">pinch-page</option>
-                    <option value="pinch-three-fingger">pinch-three-fingger</option>
-                    <option value="tap">tap</option>
+                    <option value="double-scroll">double-scroll</option>
+                    <option value="edge-page-turn">edge-page-turn</option>
+                    <option value="pinch-page-turn">pinch-page-turn</option>
+                    
                 </select>
                 <br/>
                 Menu Number:
@@ -206,8 +209,7 @@
                 </p>
                 <br/>
            
-                <p >Please measure the width and height of your screen using a ruler so we can accurately scale the test.</p>
-                 <p>
+                
                 Width (centimeters):
                 <input id="width" type="text"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="6.15" onfocus="if(value==='6.8')value=''" onblur="if(value==='')value='6.8'" autocomplete = "on">
                     <br/>
@@ -217,7 +219,7 @@
                 <br/>
             </div>
             <p>
-                Press the button to begin the test. You're goal is to tap the blue ribbons as QUICKLY and as ACCURATELY as possible. Please be sure not to change the orientation of the device or resize the window. For consistency, be sure to interact the same way throughout the test. It will start with 5 rounds of practice. If you are using a mobile device, please CLOSE THE KEYBOARD before you press start.
+               
                 <button id="start_button">Begin Test</button>
             </p>
         </div>
@@ -226,7 +228,6 @@
         
         <div id="results-overlay">
             <h3>Here are the results of your Fitts' law tests.</h3>
-            <p>Each test had two variables: the width of the ribbons and the space between the ribbons. For instance, 10X20 would mean that the ribbons were 10cm*scaleFactor pt(logic point) wide, and 20cm*scalefactor pt(logic point) apart. Each 'condition' was repeated in random order. All times are in milliseconds.</p>
             <p id="" value='scaleFactor'></p>
             <div id="results-table">
                 <table id="table-elem">
@@ -351,8 +352,11 @@
             var lastHover;
             var currentFolder;
             var lastFolder;
-            const MARGIN =40;//fingger margin to the top or buttom to active scroll
+            const MARGIN =20;//fingger margin to the top or buttom to active scroll
+            const WIN_MARGIN =5;//r margin to the top or buttom to show submenu iterm
+            const SUB_PADDING =540;//padding-top and padding-bottom for second layer menu
             var pageNo = 0;
+            const MAX_PAGE_NO = 2;
             var enterMargin = false;
             //for task 3
             var thirdStartDis = -1;
@@ -363,8 +367,31 @@
             var cursorStartDis = 0;
 
 
-            var menu_num;
-            var pinchCenterY;
+            var menu_num = 0;
+            var pinchCenterY = 0;
+            var cur_input_time = 0;
+
+
+
+            
+            const STATE_NORMAL = 1;
+            const STATE_ON_TOP_EDGE = 2;
+            const STATE_ON_DOWN_EDGE =3;
+            const STATE_ONE_FINGGER_PINCH_UP = 4;
+            const STATE_ONE_FINGGER_PINCH_DOWN = 5;
+            const STATE_NO_FINGGER = 6;
+            var cursorState = 0;
+            var cursorStateTime = 0;
+            var upFinggerPos ;
+            var downFinggerPos ;
+
+            var pinchOffset = 0;//offset to center for one fingger pinch
+            var pinchSpeed = 0;
+            var pinchInSpeed = 100;
+            var pinchInspeedTime = 0;
+            var pinchOutSpeed = -100;
+            var pinchOutSpeedTime = 0;
+
 
             var myElement = document.getElementById("test-container");
             var testContainer = $('#test-container');
@@ -466,19 +493,15 @@
                     var str = "";
                     //创建子菜单
                     for (var j = 1; j <= menu_num; j++){
-                        liStr += "<li><a href='#'>" 
+                        liStr += "<li><a href='#''>" 
                         + j 
                         + "</a></li>";
                     }
                     //创建一级菜单
                     str = "<li>" 
-                        + "<div tabindex='0' class='link folder'>"
-                        //+<i class='fa fa-globe'></i>"
-                        //+"<a href='#'>"
+                        + "<div class='link folder'><i class='fa fa-globe'></i>"
                         + i
-                        //+"</a>"
-                       // + "<i class='fa fa-chevron-down'></i>"
-                        +"</div>" 
+                        + "<i class='fa fa-chevron-down'></i></div>" 
                         + "<div id='subDiv' class='subDiv'>" 
                         + "<ul  class='submenu'>"
                         + liStr 
@@ -487,6 +510,13 @@
                         + "</li>";
                     $('#accordion').append(str);
                     }
+
+                    /* LCY */
+                    $('#accordion').height(window.innerHeight);
+                    $(window).resize(function() {
+                        $('#accordion').height(window.innerHeight);
+                    });
+                    /* LCY */
                 });
             }
 			// Find the right method, call on correct element
@@ -653,12 +683,11 @@
                  
 
 				 populateTrials();
-                // setTimeout(function() {
-                    // $("#start-overlay").hide();
-                    // populateTrials();
-                // }, 1000)
+    
 				
                 launchIntoFullscreen();
+                accordion.scrollTop(SUB_PADDING);
+
             }
             
             function validateForm() {
@@ -777,17 +806,22 @@
                      $('#cursor').css('display','block');//show cursor
 
                      mc.get('pinch').set({ enable: true });
-					//move cursor
+         
+					//move cursor core function
 					 mc.on("hammer.input",function(ev){
                        
                         //for log    
                         pointNum = ev.pointers.length;//touch point number
                         centerY =   ev.center.y;  
                         
+                        var inputTime = $.now()
+                        var lastDis ;
+                        var deltaD ;
+                        var deltaTime;
                         
                         //make sure input is pinch
                         
-                    if(ev.pointers.length==1)//just from 2 touch point to 1 touch point,find out which point lost
+                    if(pointNum==1)//just from 2 touch point to 1 touch point,find out which point lost
                     {
                         var d1 = (p1x-ev.pointers[0].x)*(p1x-ev.pointers[0].x)+(p1y-ev.pointers[0].y)*(p1y-ev.pointers[0].y);
                         var d2 = (p2x-ev.pointers[0].x)*(p2x-ev.pointers[0].x)+(p2y-ev.pointers[0].y)*(p2y-ev.pointers[0].y);
@@ -801,40 +835,58 @@
                             p2x = ev.pointers[0].x;
                             p2y = ev.pointers[0].y;
                         } 
-                        return;
+                        if(Math.abs(upFinggerPos-ev.pointers[0].y)<Math.abs(downFinggerPos-ev.pointers[0].y)){
+                            upFinggerPos = ev.pointers[0].y;
+                            downFinggerPos = -1;
+                        }
+                        else{
+                            downFinggerPos = ev.pointers[0].y;
+                            upFinggerPos = -1;
+                        }
+                        
                     }
-                           
-                       // if (ev.pointers.length != 2)  return;
-                       
-                         //for log, record location for touch point
+                    var speed=0;
+                    if(pointNum==2)
+                    {   //for log, record location for touch point
+                        
+                        lastDis = Math.abs(p2y-p1y)
                         p1x = ev.pointers[0].x;
                         p1y = ev.pointers[0].y;
                         p2x = ev.pointers[1].x;
                         p2y = ev.pointers[1].y;
-                        pinchCenterY = (p1y+p2y)/2;
-                        $('#cursor').css('top', pinchCenterY+'px');//move cursor to center of touch points
+                        upFinggerPos = Math.min(p1y,p2y);
+                        downFinggerPos = Math.max(p1y,p2y);
 
-                         var y = ev.center.y;
-                        //find out where active bar is located
-                        var minY1 = parseInt($("#ribbon-1").css('top'));
-                        var maxY1 = parseInt($("#ribbon-1").css('top')) + parseInt($("#ribbon-1").css('height'));
-                        var minY2 = parseInt($("#ribbon-2").css('top'));
-                        var maxY2 = parseInt($("#ribbon-2").css('top')) + parseInt($("#ribbon-2").css('height'));
+                        deltaD = Math.abs(p2y-p1y)-lastDis;
                         
-                        if(y >= minY1 && y <= maxY1)
-                             $("#ribbon-1").addClass('hover');
-                        else 
-                            if($("#ribbon-1").hasClass('hover')) $("#ribbon-1").removeClass('hover');
-                        if(y >= minY2 && y <= maxY2)
-                             $("#ribbon-2").addClass('hover');
+                        if(cur_input_time) deltaTime = inputTime-cur_input_time;
+                        cur_input_time = inputTime;
+
                        
-                        else 
-                            if($("#ribbon-2").hasClass('hover')) $("#ribbon-2").removeClass('hover');    
+                    
+                        
+                        
+                    }      
+                   
+                   if(pointNum>=2) pinchOffset = Math.abs(p2y-p1y)/2;
+                                 
+                    pinchCenterY = (p1y+p2y)/2
+                      
+                    //limite the cursor inner the opened menu and not out of screen
+                   if(currentFolder&&currentFolder.height()>0){
+                                pinchCenterY = (pinchCenterY<currentFolder.offset().top)?currentFolder.offset().top+1:pinchCenterY;
+                                pinchCenterY = (pinchCenterY>currentFolder.offset().top+currentFolder.height())?currentFolder.offset().top+currentFolder.height()-1:pinchCenterY;
+                                pinchCenterY = (pinchCenterY<=0)?1:pinchCenterY;
+                                pinchCenterY = (pinchCenterY>=resolution_height)?resolution_height-1:pinchCenterY;
+                            }
                         
                         //获取光标处的元素
                         // var cursorElem = document.elementFromPoint(ev.center.x, ev.center.y);
-                        var cursorElem = $(document.elementFromPoint(160,pinchCenterY));
-
+                        
+                        var cursorBom = document.elementFromPoint(160,pinchCenterY);
+                        if(!cursorBom)return;
+                        var cursorElem = $(cursorBom);
+                       
 
                         // //hover效果呈现
                         // if(lastHover!=cursorElem)
@@ -855,6 +907,7 @@
                                 currentFolder = cursorElem.parents('.subDiv').first(); //当前元素所在的folder
 
 
+                            if(!currentFolder)return;
                             if(currentFolder !== lastFolder) {
                                 if(lastFolder) {
                                     lastFolder.css('height', 0);
@@ -862,33 +915,42 @@
                                 lastFolder = currentFolder;
                             }
 
-                            //根据pinch修改菜单的高度
-                            //var subD =  document.getElementById('subDiv');
-                            var folderHeight = ev.scale * 60;
-                            var heightInc = folderHeight - currentFolder.height();
-                            if (ev.scale > 2 && heightInc > 0) {
-                                currentFolder.css('height', folderHeight + 'px');
-                                //accordion.css('top',accordion.position().top-heightInc/2+'px') ;
 
-                            } else if (folderHeight < currentFolder.height() * 0.7) {
+                           
+                              $('#cursor').css('top', pinchCenterY+'px');//move cursor to center of touch points
+
+                            //根据pinch修改菜单的高度
+                                 var folderHeight  ;
+                            if(pointNum==1)
+                            {
+                                folderHeight = pinchOffset*2;
+                              
+                            }
+                            else folderHeight = Math.abs(p1y-p2y);
+                            var heightInc = folderHeight - currentFolder.height();
+                            if (folderHeight > 100 && heightInc > 0) {
+                                currentFolder.css('height', folderHeight + 'px');
+                           
+                            } else {
                                 currentFolder.css('height', 0 + 'px');
-                                //一级菜单回到一当前光标为中心的位置
-                                 accordion.css('top', accordion.offset().top + cursor.offset().top - currentFolder.offset().top + 'px');
-                                 pageNo = 0;
-                            }         
+                                pageNo = 0;
+                                 cursorState = 0;
+                            }        
                             var maxFingersDisY = Math.max(Math.abs(p1y-p2y),0);
-                            //var maxFingersDisY = resolution_height/2;
-                            var cursorMoveRange = resolution_height-maxFingersDisY-2*MARGIN;
+                            var cursorMoveRange = resolution_height;
                             //如果菜单打开,则保持外层菜单与光标同步移动
                             var submenu = 	currentFolder.children(".submenu");
                             if(currentFolder.height()>0){
-                               // accordion.css('top',accordion.offset().top+cursor.offset().top-currentFolder.height()/2-currentFolder.offset().top+'px') ;
+                                //accordion.css('top',accordion.offset().top+cursor.offset().top-currentFolder.height()/2-currentFolder.offset().top+'px') ;
                                 //外层菜单移动而内部内容向保持不移动
                                 
-                                 //  
+                                 //limit the opened menu not out of the screen
+
 
                                 var menuWinCenterScrollHeight = currentFolder.offset().top+accordion.scrollTop()+Math.round(folderHeight/2);
-                                accordion.scrollTop(menuWinCenterScrollHeight-cursor.offset().top);
+                                //if((currentFolder.offset().top+currentFolder.height())<resolution_height-10&&currentFolder.offset().top>10)
+                                if(cursor.offset().top+Math.round(folderHeight/2)<resolution_height&&cursor.offset().top-Math.round(folderHeight/2)>0)
+                                  accordion.scrollTop(menuWinCenterScrollHeight-cursor.offset().top);
                                     //alert(currentFolder.position().top);
                                 
                             }
@@ -896,81 +958,115 @@
                                 //if(cursorStartDis!==cursor.offset().top-accordion.offset().top)
                                     //accordion.css('top',cursor.offset().top-cursorStartDis+'px') ;
                             }     
+                            var scrollPos ;
                             if(currentFolder.height()>0) 
                             {
                             //task 1
                             
-                                if($("#type").val()=="pinch-scroll")
-                                {
-                                
-                                var speedRatio ;
-                                speedRatio = submenu.height()/cursorMoveRange;
-                                var submenuTop = cursor.offset().top-speedRatio*(cursor.offset().top-maxFingersDisY/2-MARGIN);
-                                //var submenuTop = 320-speedRatio*(320-maxFingersDisY/2);
-                            // console.log(submenu.height()+"|"+cursorMoveRange+"|"+cursor.offset().top);
-                            
-                            
-                                submenu.css('top',submenuTop-currentFolder.offset().top+'px');
+                                if($("#type").val()=="double-scroll")
+                                {                 
+                                scrollPos = submenu.height()*cursor.offset().top/resolution_height+SUB_PADDING-cursor.offset().top+currentFolder.offset().top;
+                                currentFolder.scrollTop(scrollPos) ;   
+                           
                                 }
+
                                 //task 2
 
-                                var upFinggerPos = Math.min(p1y,p2y);
-                                var downFinggerPos = Math.max(p1y,p2y);
+                               
                                 if($("#type").val()=="pinch-page")
                                 {
-                                    if((upFinggerPos<MARGIN)&&!enterMargin)//fingger close to the top
-                                    {
-                                        enterMargin = true;
-                                        if(enterMargin)pageNo = pageNo+1;
-                                    }
-                                    if(downFinggerPos>(resolution_height-MARGIN)&&!enterMargin)//fingger close to the bottom
-                                    {    enterMargin = true;
-                                        if(enterMargin)pageNo = pageNo-1;
-                                        
-                                    }
-                                    if(upFinggerPos>MARGIN&&downFinggerPos<(resolution_height-MARGIN))//fingger not in the margin area
-                                    {enterMargin = false;}
+                                  
 
-                                    
-                                    submenu.css('top',pageNo*cursorMoveRange-currentFolder.offset().top+'px')
+                                    var animation = false;
+                                    if($('#cursor').offset().top < MARGIN) {
+                                        if(cursorState == 0) {
+                                            pageNo = Math.max(0, pageNo - 1);
+                                            cursorState = 1;
+                                            animation = true;
+                                            console.log('event 1');
+                                        }
+                                    } else if($('#cursor').offset().top > window.innerHeight - MARGIN) {
+                                        if(cursorState == 0) {
+                                            pageNo += 1;
+                                            cursorState = 2;
+                                            animation = true;
+                                            console.log('event 2');
+                                        }
+                                    } else console.log('event 0'), cursorState = 0;
+
+                                    scrollPos = SUB_PADDING + currentFolder.offset().top + pageNo * resolution_height;
+                                    if(new Date() - cursorStateTime > 500) {
+                                        if(animation) {
+                                            currentFolder.animate({ scrollTop: scrollPos }, 500, 'swing');
+                                            cursorStateTime = new Date();
+                                        } else {
+                                            currentFolder.scrollTop(scrollPos);
+                                        }
+                                    }
+                                  
                                 }
                                 //task 3
-                                if(($("#type").val()=="pinch-three-fingger")&&ev.pointers.length==3)
-                                {
-                                    // var dis 
+                                if(($("#type").val()=="pinch-three-fingger"))
+                                {    
+                                    var animation = false;                              
+                                       if(deltaD!=0)
+                                        {  speed = deltaD/deltaTime;
+                                            if(speed>0)
+                                            {   if(pinchOutSpeed<speed)
+                                                {   pinchOutSpeed = speed;
+                                                    pinchOutSpeedTime = inputTime;}
+                                                } else {  
+                                                    if(pinchInSpeed>speed)
+                                                    {   pinchInSpeed = speed;
+                                                        pinchInspeedTime = inputTime;  }
+                                                }
 
-                                    // if(p3y>=0)
-                                    // {dis = ev.pointers[2].y-p3y;
-                                    // submenu.css('top',submenu.attr("top")+'px');
-                                    // p3y = ev.pointers[2].y;
-                                    // }
-                                    // else p3y = ev.pointers[2].y;
-                                    var currentY = ev.pointers[2].clientY;
-                                    if(thirdStartDis == -1)
-                                        thirdStartDis = currentY, currentTop = parseInt(currentFolder.children().first().css('top'), 10);
-                                    else if(currentFolder.height() > 0) {
-                                        var cfh = parseInt(currentFolder.css('height'), 10);
-                                        var ele = currentFolder.children("ul").children("li");
-                                        var len = ele.size();
-                                        var sgn = ele.first() ? ele.first().height() : 0;
-                                        var ful = sgn * len;
-                                        currentFolder.children().css('top', Math.max(- ful + cfh * 0.5, Math.min(cfh * 0.5, currentTop - thirdStartDis + currentY)));
-                                    }
-                                    // clearTimeout(timeoutId);
-                                    // timeoutId = setTimeout(function() {
-                                    //     thirdStartDis = -1;
-                                    // }, 50);
+                                        }
+
+                                        if(deltaD==0&&pinchOutSpeed>2&&pinchInSpeed<-2&&Math.abs(pinchInspeedTime-pinchOutSpeedTime)>60)
+                                        {  if(pinchInspeedTime-pinchOutSpeedTime>0){
+                                            pageNo = Math.min(pageNo+1,MAX_PAGE_NO);
+                                            animation = true;
+                                            } else{pageNo = Math.max(0, pageNo - 1);
+                                                animation = true;
+                                            
+                                            }
+
+                                            pinchOutSpeed = -100;
+                                            pinchOutSpeedTime = 0;
+                                            pinchInSpeed = 100;
+                                            pinchInspeedTime = 0;  
+                                        }
+                                        if(deltaD==0){
+                                            pinchOutSpeed = -100;
+                                            pinchOutSpeedTime = 0;
+                                            pinchInSpeed = 100;
+                                            pinchInspeedTime = 0;
+                                        }
+
+                                        scrollPos = SUB_PADDING + currentFolder.offset().top + pageNo * resolution_height;
+                                        if(new Date() - cursorStateTime > 500) {
+                                            if(animation) {
+                                                currentFolder.animate({ scrollTop: scrollPos }, 500, 'swing');
+                                                cursorStateTime = new Date();
+                                            } else {
+                                                currentFolder.scrollTop(scrollPos);
+                                            }
+                                        }
+                                    
 
                                 }
-                                else 
-                                {p3y = -1;
-                                    thirdStartDis = -1;
-                                }
+                              
                             }
-                            //     $("#debug-overlay").text(
+                             //   $("#debug-overlay").text(""
+                               //     ev.scale
                             //     ev.type+":"+ev.pointers.length+"p :x="+ev.center.x+";y="+ev.center.y
                             //     //+"|pt:"+currentFolder.position().top
-                            //     //+"|ot:"+currentFolder.offset().top
+                                 //+"|ot:"+currentFolder.offset().top
+                                // +"|ot:"+(currentFolder.offset().top+currentFolder.height())
+                                //  +"|y:"+pinchCenterY
+                                // +"|s:"+cursorState
+                                // +"|p"+pointNum
                             //     //+"|ts:"+testContainer.scrollTop()
                             //     //+"|ts:"+accordion.scrollTop()
                             //     //+" s:"+speedRatio
@@ -980,21 +1076,18 @@
                             //     +" pt:"+cursorElem.position().top
                             //     +" pg:"+pageNo
                             // //+" rh"+resolution_height
-                                
-                            //     );
+                                //+"h:"+submenu.height()
+                              //  +"|r:"+cursor.offset().top/resolution_height
+                           //   +"s:"+pinchInSpeed
+                            //  +"|os:"+pinchOutSpeed
+                            //    );
 
                                  
 						 });
-					//hide cursor
-					// mc.on("pinchend",function(ev){
-					// 	$('#cursor').css('display','none');
-					// });
+				
 
-					mc.on("hammer.input",trialPinch);
-					// if(guestureType==='pinchIn')mc.on("pinchin", trialPinch);
-					// else if(guestureType==='pinchOut')mc.on("pinchout", trialPinch);
-					// else alert("Wrong gesture type!");
-                    setInterval(showHover, 30);//ms
+					//mc.on("hammer.input",trialPinch);
+					
                     writeLogInt = setInterval(writeLog, 30);//ms
 					
 				}                  
@@ -1059,13 +1152,7 @@
                         return;
                     }
                     
-                    //Now that we've queued something, toggle the interstitial screen
-                    // $(".ribbon").css("backgroundColor","");
-                    // trial_flash_queued = false;
-                    
-                   //if($('#type option:selected').val()==='tap') $("#test-container").unbind();
-                   //$("#interstitial-overlay").show();   
-                   //setInterval(clearInterstitialOverlay, 3000);
+          
                    clearInterstitialOverlay();
                     
                 }
@@ -1287,44 +1374,27 @@
 			}
             function showHover()
             {
-
                 //获取光标处的元素
-                                         var cursorElem = document.elementFromPoint(160,cursor.position().top+1);
-                                         cursorElem.focus();
-                                        // if(lastHover)
-                                        // {
-                                        //     var dis = cursor.position().top-lastHover.position().top;
-                                        //     if(dis<0||dis>lastHover.height())
-                                        //     {
-                                        //         var cursorElem = $(document.elementFromPoint(160,cursor.position().top+1));
-                                        //     }
-                                        //     if(lastHover!=cursorElem)
-                                        //     {
-                                        //         //lastHover.removeClass('hover');
-                                        //         //cursorElem.addClass('hover');
-                                        //         cursorElem.focus();
-                                        //         lastHover = cursorElem;
-                                        //     }
-                                        // }
-                                        // else{
-                                        //     lastHover = $(document.elementFromPoint(160,cursor.position().top));
-                                        // }
-
                                         
-
-                                       // $("#debug-overlay").text(cursorElem.text()+'ll');
-                                        //hover效果呈现
-                                        //if(lastHover!=cursorElem)
-                                        // {
-                                        //     if (lastHover) {
-                                        //         lastHover.removeClass('hover');
-                                        //         //lastHover.css('background','white');
-                                        //         }
-                                        
-                                        //     cursorElem.addClass('hover');
-                                        //     //cursorElem.css('background','red');
-                                        //     lastHover = cursorElem;
-                                        // }
+                if(!lastHover)
+                {
+                    var cursorElem = $(document.elementFromPoint(160,cursor.position().top+1));
+                }
+                var dis = cursor.position().top-lastHover.position().top;
+                if(dis>0&&dis<lastHover.height())
+                $("#debug-overlay").text(cursorElem.text());
+                //hover效果呈现
+                //if(lastHover!=cursorElem)
+                {
+                    if (lastHover) {
+                        lastHover.removeClass('hover');
+                        
+                        }
+                
+                    cursorElem.addClass('hover');
+                    
+                    lastHover = cursorElem;
+                }
 
             }
 
